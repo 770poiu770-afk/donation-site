@@ -32,7 +32,7 @@ function donateConfig(lang) {
 }
 
 router.use((req, res, next) => {
-  res.locals.donateConfig = donateConfig(req.lang);
+  res.locals.donateConfig = { ...donateConfig(req.lang), nonce: res.locals.cspNonce };
   res.locals.formatMoney = (cents) => formatMoney(cents, config.currency, req.lang === 'he' ? 'he-IL' : 'en-US');
   res.locals.path = req.path;
   res.locals.baseUrl = config.baseUrl;

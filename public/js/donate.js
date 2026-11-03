@@ -128,6 +128,7 @@
       s.src = cfg.sdkBase + '?' + params.toString();
       s.dataset.namespace = ns;
       s.dataset.pageType = 'checkout';
+      if (cfg.nonce) { s.nonce = cfg.nonce; s.setAttribute('data-csp-nonce', cfg.nonce); }
       s.async = true;
       s.onload = () => (window[ns] ? resolve(window[ns]) : reject(new Error('sdk')));
       s.onerror = () => { delete sdkPromises[kind]; reject(new Error('sdk')); };

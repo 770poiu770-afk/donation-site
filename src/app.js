@@ -18,13 +18,19 @@ function createApp({ mock } = {}) {
 
   db.get(); // open/migrate database
 
+  // Per-request nonce so PayPal's SDK can run its small inline scripts under our CSP
+  app.use((req, res, next) => {
+    res.locals.cspNonce = require('crypto').randomBytes(16).toString('base64');
+    next();
+  });
+
   const paypalSrc = ['https://www.paypal.com', 'https://*.paypal.com', 'https://*.paypalobjects.com', 'https://www.sandbox.paypal.com'];
   app.use(
     helmet({
       contentSecurityPolicy: {
         useDefaults: true,
         directives: {
-          'script-src': ["'self'", ...paypalSrc],
+          'script-src': ["'self'", ...paypalSrc, (req, res) => `'nonce-${res.locals.cspNonce}'`],
           'style-src': ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
           'font-src': ["'self'", 'https://fonts.gstatic.com', 'data:'],
           'img-src': ["'self'", 'data:', ...paypalSrc],
