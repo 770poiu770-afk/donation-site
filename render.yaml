@@ -18,7 +18,7 @@ services:
       - key: TIMEZONE
         value: Asia/Jerusalem
       - key: PAYPAL_MODE
-        value: sandbox
+        sync: false
       - key: SESSION_SECRET
         generateValue: true
       - key: PAYPAL_CLIENT_ID
