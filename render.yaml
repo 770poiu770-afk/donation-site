@@ -2,20 +2,17 @@ services:
   - type: web
     name: donation-site
     runtime: node
-    plan: starter
+    plan: free
     region: frankfurt
     buildCommand: npm ci --omit=dev
     startCommand: node server.js
     healthCheckPath: /healthz
-    disk:
-      name: data
-      mountPath: /var/data
-      sizeGB: 1
+    # Free plan has no persistent disk: the donations list resets on restart.
+    # Before accepting real donations: switch to plan: starter and add
+    #   disk: { name: data, mountPath: /var/data, sizeGB: 1 }
     envVars:
       - key: NODE_ENV
         value: production
-      - key: DATABASE_PATH
-        value: /var/data/donations.db
       - key: TRUST_PROXY
         value: "1"
       - key: TIMEZONE
