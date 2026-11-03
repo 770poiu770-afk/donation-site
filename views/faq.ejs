@@ -1,0 +1,12 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+<main id="main" class="page">
+  <section class="section">
+    <div class="container narrow">
+      <h1 class="section-title center"><%= t('faq.title') %></h1>
+      <%- include('partials/faq-list') %>
+      <p class="center" style="margin-top:2.5rem"><a class="btn btn-gold btn-lg" href="/#donate"><%= t('nav.donate') %></a></p>
+    </div>
+  </section>
+</main>
+<%- include('partials/footer') %>

@@ -1,0 +1,40 @@
+<%- include('_top', { title: 'תרומות' }) %>
+<h1>תרומות</h1>
+<form class="filters card" method="get" action="/admin/donations">
+  <label class="grow">חיפוש<input type="search" name="q" value="<%= q.q || '' %>" placeholder="שם, אימייל, מספר עסקה, הודעה…"></label>
+  <label>סטטוס
+    <select name="status">
+      <option value="">הכול (ללא נטושות)</option>
+      <option value="paid" <%= q.status === 'paid' ? 'selected' : '' %>>שולמו בפועל</option>
+      <% statuses.forEach(st => { %><option value="<%= st %>" <%= q.status === st ? 'selected' : '' %>><%= statusLabel[st] %></option><% }) %>
+    </select>
+  </label>
+  <label>סוג
+    <select name="type">
+      <option value="">הכול</option>
+      <option value="one_time" <%= q.type === 'one_time' ? 'selected' : '' %>>חד-פעמית</option>
+      <option value="monthly" <%= q.type === 'monthly' ? 'selected' : '' %>>חודשית</option>
+    </select>
+  </label>
+  <label>מתאריך<input type="date" name="from" value="<%= q.from || '' %>"></label>
+  <label>עד תאריך<input type="date" name="to" value="<%= q.to || '' %>"></label>
+  <label>סכום מינימלי ($)<input type="number" name="min" min="0" step="1" value="<%= q.min || '' %>"></label>
+  <div class="filter-actions">
+    <button class="btn" type="submit">סינון</button>
+    <a class="btn btn-ghost" href="/admin/donations">ניקוי</a>
+    <a class="btn btn-ghost" href="/admin/donations.csv<%= qs ? '?' + qs : '' %>">ייצוא ל-Excel (CSV)</a>
+  </div>
+</form>
+<p class="result-line"><strong><%= result.count %></strong> רשומות · סכום ששולם בפועל: <strong><%= money(result.sum) %></strong></p>
+<section class="card flush">
+  <%- include('_rows', { rows: result.rows }) %>
+</section>
+<% if (result.pages > 1) { %>
+<nav class="pager">
+  <% if (page > 1) { %><a href="?<%= qs %><%= qs ? '&' : '' %>page=<%= page - 1 %>">→ הקודם</a><% } %>
+  <span>עמוד <%= page %> מתוך <%= result.pages %></span>
+  <% if (page < result.pages) { %><a href="?<%= qs %><%= qs ? '&' : '' %>page=<%= page + 1 %>">הבא ←</a><% } %>
+</nav>
+<% } %>
+<script src="/static/js/admin.js?v=<%= assetVersion %>" defer></script>
+<%- include('_bottom') %>

@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex, nofollow">
+  <title>כניסה · ניהול תרומות</title>
+  <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&display=swap">
+  <link rel="stylesheet" href="/static/css/admin.css?v=<%= assetVersion %>">
+</head>
+<body class="login-page">
+  <form class="login-card" method="post" action="/admin/login">
+    <img src="/static/img/logo.svg" alt="" width="56" height="56">
+    <h1>ניהול תרומות</h1>
+    <% if (disabled) { %><p class="alert">הכניסה מושבתת: לא הוגדרה סיסמת מנהל (ADMIN_PASSWORD_HASH). הריצו <code>npm run admin:password</code>.</p><% } %>
+    <% if (error) { %><p class="alert"><%= error %></p><% } %>
+    <label>שם משתמש<input name="username" autocomplete="username" required dir="ltr"></label>
+    <label>סיסמה<input name="password" type="password" autocomplete="current-password" required dir="ltr"></label>
+    <button class="btn" type="submit">כניסה</button>
+  </form>
+</body>
+</html>

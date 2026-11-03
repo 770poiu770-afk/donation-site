@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title><%= locals.title ? title + ' · ' : '' %>ניהול תרומות</title>
+  <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&display=swap">
+  <link rel="stylesheet" href="/static/css/admin.css?v=<%= assetVersion %>">
+</head>
+<body>
+<% if (mode !== 'live') { %><div class="mode-banner"><%= mode === 'mock' ? 'מצב הדגמה — אין תשלומים אמיתיים' : 'PayPal Sandbox — תשלומי בדיקה בלבד' %></div><% } %>
+<header class="topbar">
+  <a class="brand" href="/admin"><img src="/static/img/logo.svg" alt="" width="30" height="30"> ניהול תרומות</a>
+  <nav>
+    <a href="/admin" class="<%= path === '/' ? 'on' : '' %>">לוח בקרה</a>
+    <a href="/admin/donations" class="<%= path.startsWith('/donations') ? 'on' : '' %>">תרומות</a>
+    <a href="/admin/subscriptions" class="<%= path.startsWith('/subscriptions') ? 'on' : '' %>">הוראות קבע</a>
+    <a href="/admin/messages" class="<%= path.startsWith('/messages') ? 'on' : '' %>">פניות</a>
+    <a href="/admin/system" class="<%= path.startsWith('/system') ? 'on' : '' %>">מערכת ו-PayPal</a>
+  </nav>
+  <div class="who">
+    <a href="/" target="_blank" rel="noopener">לאתר ↗</a>
+    <form method="post" action="/admin/logout"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit">התנתקות</button></form>
+  </div>
+</header>
+<main class="wrap">

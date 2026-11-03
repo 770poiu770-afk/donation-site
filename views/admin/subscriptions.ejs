@@ -1,0 +1,29 @@
+<%- include('_top', { title: 'הוראות קבע' }) %>
+<h1>הוראות קבע (תרומות חודשיות)</h1>
+<nav class="chips">
+  <a href="/admin/subscriptions" class="<%= !status ? 'on' : '' %>">הכול</a>
+  <% ['active', 'suspended', 'cancelled', 'expired', 'approved'].forEach(st => { %><a href="?status=<%= st %>" class="<%= status === st ? 'on' : '' %>"><%= statusLabel[st] %></a><% }) %>
+</nav>
+<section class="card flush">
+  <div class="tbl-wrap">
+  <table class="tbl">
+    <thead><tr><th>נוצרה</th><th>תורם</th><th>סכום חודשי</th><th>סטטוס</th><th>תשלומים</th><th>נגבה עד כה</th><th>מזהה PayPal</th></tr></thead>
+    <tbody>
+      <% if (!rows.length) { %><tr><td colspan="7" class="empty">אין הוראות קבע להצגה.</td></tr><% } %>
+      <% rows.forEach(r => { %>
+      <tr>
+        <td><%= fmtDate(r.created_at) %></td>
+        <td><%= r.payer_name || r.donor_name || 'אנונימי' %><% if (r.payer_email || r.donor_email) { %><div class="sub" dir="ltr"><%= r.payer_email || r.donor_email %></div><% } %></td>
+        <td dir="ltr"><strong><%= money(r.amount_cents) %></strong></td>
+        <td><span class="badge b-<%= r.status %>"><%= statusLabel[r.status] || r.status %></span></td>
+        <td><%= r.payments %></td>
+        <td dir="ltr"><%= money(r.collected) %></td>
+        <td dir="ltr" class="mono ta-r"><%= r.paypal_subscription_id || '—' %></td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+  </div>
+</section>
+<p class="note">ביטול הוראת קבע מתבצע על ידי התורם בחשבון ה-PayPal שלו, או על ידך בחשבון ה-PayPal של העמותה (Activity → Subscriptions). השינוי יתעדכן כאן אוטומטית דרך Webhook.</p>
+<%- include('_bottom') %>

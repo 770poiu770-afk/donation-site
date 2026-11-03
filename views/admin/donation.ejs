@@ -1,0 +1,55 @@
+<%- include('_top', { title: 'תרומה ' + d.id }) %>
+<p class="crumbs"><a href="/admin/donations">→ חזרה לתרומות</a></p>
+<div class="detail-head">
+  <h1 dir="ltr"><%= money(d.amount_cents) %></h1>
+  <span class="badge b-<%= d.status %>"><%= statusLabel[d.status] || d.status %></span>
+  <span class="pill"><%= d.type === 'monthly' ? 'תרומה חודשית' : 'תרומה חד-פעמית' %></span>
+</div>
+<% if (d.failure_reason) { %><div class="warn-box"><%= d.failure_reason %></div><% } %>
+<div class="grid2">
+  <section class="card">
+    <h2>פרטי העסקה</h2>
+    <dl class="kv">
+      <dt>אסמכתא באתר</dt><dd dir="ltr" class="mono"><%= d.public_id %></dd>
+      <dt>נוצרה</dt><dd><%= fmtDate(d.created_at) %></dd>
+      <dt>שולמה</dt><dd><%= fmtDate(d.completed_at) %></dd>
+      <dt>סכום</dt><dd dir="ltr"><%= money(d.amount_cents) %> <%= d.currency %></dd>
+      <dt>עמלת PayPal</dt><dd dir="ltr"><%= d.fee_cents != null ? money(d.fee_cents) : '—' %></dd>
+      <dt>נטו</dt><dd dir="ltr"><%= d.net_cents != null ? money(d.net_cents) : '—' %></dd>
+      <dt>הוחזר</dt><dd dir="ltr"><%= money(d.refunded_cents) %></dd>
+      <dt>מספר הזמנה (Order)</dt><dd dir="ltr" class="mono"><%= d.paypal_order_id || '—' %></dd>
+      <dt>מספר עסקה (Transaction)</dt><dd dir="ltr" class="mono"><%= d.paypal_capture_id || '—' %>
+        <% if (d.paypal_capture_id && mode !== 'mock') { %><a class="ext" target="_blank" rel="noopener" href="<%= paypalHost %>/activity/payment/<%= d.paypal_capture_id %>">פתיחה ב-PayPal ↗</a><% } %></dd>
+      <% if (sub) { %><dt>הוראת קבע</dt><dd dir="ltr" class="mono"><a href="/admin/subscriptions"><%= sub.paypal_subscription_id %></a></dd><% } %>
+    </dl>
+  </section>
+  <section class="card">
+    <h2>פרטי התורם</h2>
+    <dl class="kv">
+      <dt>שם (מ-PayPal)</dt><dd><%= d.payer_name || '—' %></dd>
+      <dt>אימייל (מ-PayPal)</dt><dd dir="ltr"><%= d.payer_email || '—' %></dd>
+      <dt>מדינה</dt><dd><%= d.payer_country || '—' %></dd>
+      <dt>מזהה משלם</dt><dd dir="ltr" class="mono"><%= d.payer_id || '—' %></dd>
+      <dt>שם שנמסר באתר (רשות)</dt><dd><%= d.donor_name || '—' %></dd>
+      <dt>אימייל שנמסר באתר (רשות)</dt><dd dir="ltr"><%= d.donor_email || '—' %></dd>
+      <dt>הודעה אישית</dt><dd class="pre"><%= d.message || '—' %></dd>
+      <dt>שפת האתר</dt><dd><%= d.lang === 'he' ? 'עברית' : d.lang === 'en' ? 'אנגלית' : '—' %></dd>
+    </dl>
+    <p class="note">שמות תורמים לא מוצגים באתר הציבורי בשום מקום.</p>
+  </section>
+</div>
+<% if (refunds.length) { %>
+<section class="card">
+  <h2>החזרים</h2>
+  <table class="tbl"><thead><tr><th>מספר החזר</th><th>סכום</th><th>תאריך</th></tr></thead><tbody>
+  <% refunds.forEach(r => { %><tr><td dir="ltr" class="mono ta-r"><%= r.refund_id %></td><td dir="ltr"><%= money(r.amount_cents) %></td><td><%= fmtDate(r.created_at) %></td></tr><% }) %>
+  </tbody></table>
+</section>
+<% } %>
+<section class="card">
+  <h2>יומן עסקה</h2>
+  <ol class="timeline">
+    <% log.forEach(l => { %><li><time><%= fmtDate(l.created_at) %></time><code><%= l.event %></code><% if (l.details) { %><pre dir="ltr"><%= l.details %></pre><% } %></li><% }) %>
+  </ol>
+</section>
+<%- include('_bottom') %>

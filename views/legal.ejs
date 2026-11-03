@@ -1,0 +1,107 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+<% const legal = orgName + (org.registrationNumber ? ' (' + org.registrationNumber + ')' : ''); const updated = (locals.site && site.legal && site.legal.lastUpdated) || '2026-11-03'; %>
+<main id="main" class="page">
+  <section class="section">
+    <article class="container narrow legal">
+<% if (doc === 'privacy' && lang === 'he') { %>
+      <h1>מדיניות פרטיות</h1>
+      <p class="muted">עודכן לאחרונה: <%= updated %></p>
+      <p>מדיניות זו מסבירה איזה מידע <%= legal %> ("העמותה", "אנחנו") אוספת כשאתם משתמשים באתר ותורמים, ואיך אנחנו משתמשים בו.</p>
+      <h2>איזה מידע אנחנו אוספים</h2>
+      <ul>
+        <li><strong>מידע שאתם בוחרים למסור (רשות):</strong> שם, כתובת אימייל והודעה אישית בטופס התרומה, ופרטים שאתם שולחים בטופס יצירת הקשר.</li>
+        <li><strong>מידע שמתקבל מ-PayPal לאחר תשלום:</strong> סכום, מטבע, תאריך, מספר עסקה, סטטוס התשלום ובמקרים מסוימים שם המשלם, כתובת האימייל שלו ומדינתו — כפי ש-PayPal מעבירה לנו.</li>
+        <li><strong>אנחנו לא מקבלים ולא שומרים פרטי כרטיס אשראי.</strong> התשלום מתבצע כולו במערכת של PayPal.</li>
+      </ul>
+      <h2>למה אנחנו משתמשים במידע</h2>
+      <ul>
+        <li>לעיבוד ותיעוד התרומות, לניהול חשבונות ולעמידה בדרישות החוק.</li>
+        <li>להנפקת קבלות ולמענה לפניות שלכם.</li>
+        <li>למניעת הונאות ושימוש לרעה.</li>
+      </ul>
+      <h2>אנונימיות</h2>
+      <p>אנחנו לא מפרסמים באתר שמות של תורמים. מידע שמתקבל מ-PayPal נשמר במערכת הניהול הפנימית של העמותה לצורכי תיעוד בלבד.</p>
+      <h2>שיתוף מידע</h2>
+      <p>אנחנו לא מוכרים מידע אישי. המידע עשוי להיות משותף רק עם ספקי שירות הדרושים להפעלת האתר (כגון PayPal ושירותי אחסון), או כשהדבר נדרש על פי דין. העיבוד ב-PayPal כפוף למדיניות הפרטיות של PayPal.</p>
+      <h2>עוגיות</h2>
+      <p>האתר משתמש בעוגייה אחת לשמירת בחירת השפה. רכיב התשלום של PayPal עשוי להשתמש בעוגיות משלו לצורכי אבטחה ומניעת הונאות.</p>
+      <h2>שמירת מידע ואבטחה</h2>
+      <p>אנחנו שומרים רשומות תרומה כל עוד הדבר נדרש לצורכי הנהלת חשבונות ודיווח על פי דין. הגישה למערכת הניהול מוגבלת ומוגנת, והאתר פועל בחיבור מוצפן (HTTPS).</p>
+      <h2>הזכויות שלכם</h2>
+      <p>אתם רשאים לבקש לעיין במידע שנשמר עליכם, לתקן אותו או לבקש את מחיקתו, בכפוף לחובות שמירת מידע על פי דין. פנו אלינו בכתובת <a href="mailto:<%= org.email %>"><%= org.email %></a>.</p>
+<% } else if (doc === 'privacy') { %>
+      <h1>Privacy Policy</h1>
+      <p class="muted">Last updated: <%= updated %></p>
+      <p>This policy explains what information <%= legal %> (“we”, “the organization”) collects when you use this site and donate, and how we use it.</p>
+      <h2>Information we collect</h2>
+      <ul>
+        <li><strong>Information you choose to give (optional):</strong> name, email and a personal message in the donation form, and the details you send through the contact form.</li>
+        <li><strong>Information from PayPal after a payment:</strong> amount, currency, date, transaction ID, payment status and, in some cases, the payer’s name, email and country — as provided by PayPal.</li>
+        <li><strong>We never receive or store card numbers.</strong> Payments are processed entirely by PayPal.</li>
+      </ul>
+      <h2>How we use it</h2>
+      <ul>
+        <li>To process and record donations, keep accounts and meet legal obligations.</li>
+        <li>To issue receipts and answer your enquiries.</li>
+        <li>To prevent fraud and abuse.</li>
+      </ul>
+      <h2>Anonymity</h2>
+      <p>We never publish donor names on this site. Information received from PayPal is kept in our internal administration system for record-keeping only.</p>
+      <h2>Sharing</h2>
+      <p>We do not sell personal information. It may be shared only with service providers needed to run the site (such as PayPal and hosting), or when required by law. Processing by PayPal is governed by PayPal’s own privacy statement.</p>
+      <h2>Cookies</h2>
+      <p>This site uses one cookie to remember your language. PayPal’s checkout component may use its own cookies for security and fraud prevention.</p>
+      <h2>Retention and security</h2>
+      <p>We keep donation records for as long as needed for accounting and legal reporting. Access to the administration system is restricted and protected, and the site runs over an encrypted (HTTPS) connection.</p>
+      <h2>Your rights</h2>
+      <p>You may ask to access, correct or delete your information, subject to legal record-keeping duties. Contact us at <a href="mailto:<%= org.email %>"><%= org.email %></a>.</p>
+<% } else if (lang === 'he') { %>
+      <h1>תנאי שימוש</h1>
+      <p class="muted">עודכן לאחרונה: <%= updated %></p>
+      <p>השימוש באתר ומתן תרומה דרכו כפופים לתנאים הבאים.</p>
+      <h2>תרומות</h2>
+      <ul>
+        <li>התרומות הן וולונטריות ומשמשות לפעילות העמותה ולמטרותיה, לפי שיקול דעת העמותה.</li>
+        <li>התרומות נגבות בדולר אמריקאי (USD). המרת מטבע, ככל שנדרשת, מתבצעת על ידי PayPal או הבנק שלכם.</li>
+        <li>התשלומים מעובדים על ידי PayPal, בכפוף לתנאים ולמגבלות של PayPal, לרבות מגבלות סכום לעסקה.</li>
+      </ul>
+      <h2>תרומה חודשית</h2>
+      <p>תרומה חודשית תחויב פעם בחודש עד לביטולה. ניתן לבטל בכל עת דרך חשבון ה-PayPal או בפנייה אלינו. הביטול יחול על חיובים עתידיים.</p>
+      <h2>החזרים</h2>
+      <p>אם תרמתם בטעות או בסכום שגוי, פנו אלינו תוך 30 יום עם מספר העסקה ונבדוק את הבקשה. החזרים ניתנים לפי שיקול דעת העמותה ובהתאם לדין.</p>
+      <h2>קבלות</h2>
+      <p>PayPal שולחת אישור תשלום במייל. לקבלה רשמית פנו אלינו עם מספר העסקה.</p>
+      <h2>אחריות</h2>
+      <p>האתר מסופק כפי שהוא. אנחנו פועלים לשמור על זמינות ואבטחה, אך איננו אחראים לתקלות בשירותי צד שלישי.</p>
+      <h2>דין וסמכות שיפוט</h2>
+      <p>על תנאים אלה יחולו דיני מדינת ישראל.</p>
+      <h2>יצירת קשר</h2>
+      <p><a href="mailto:<%= org.email %>"><%= org.email %></a></p>
+<% } else { %>
+      <h1>Terms of Use</h1>
+      <p class="muted">Last updated: <%= updated %></p>
+      <p>Using this site and donating through it are subject to the following terms.</p>
+      <h2>Donations</h2>
+      <ul>
+        <li>Donations are voluntary and support the organization’s activities and purposes, at the organization’s discretion.</li>
+        <li>Donations are charged in US dollars (USD). Any currency conversion is done by PayPal or your bank.</li>
+        <li>Payments are processed by PayPal and are subject to PayPal’s terms and limits, including per-transaction limits.</li>
+      </ul>
+      <h2>Monthly donations</h2>
+      <p>A monthly donation is charged once a month until cancelled. You can cancel anytime from your PayPal account or by contacting us. Cancellation applies to future charges.</p>
+      <h2>Refunds</h2>
+      <p>If you donated by mistake or in the wrong amount, contact us within 30 days with your transaction ID and we will review your request. Refunds are at the organization’s discretion and in accordance with the law.</p>
+      <h2>Receipts</h2>
+      <p>PayPal emails you a payment confirmation. For an official receipt, contact us with your transaction ID.</p>
+      <h2>Liability</h2>
+      <p>The site is provided as is. We work to keep it available and secure but are not responsible for outages of third-party services.</p>
+      <h2>Governing law</h2>
+      <p>These terms are governed by the laws of the State of Israel.</p>
+      <h2>Contact</h2>
+      <p><a href="mailto:<%= org.email %>"><%= org.email %></a></p>
+<% } %>
+    </article>
+  </section>
+</main>
+<%- include('partials/footer') %>

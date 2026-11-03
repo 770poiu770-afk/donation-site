@@ -1,0 +1,52 @@
+<%- include('_top', { title: 'לוח בקרה' }) %>
+<% if (warnings.length) { %>
+<div class="warn-box"><strong>לתשומת לבך:</strong><ul><% warnings.forEach(w => { %><li><%= w %></li><% }) %></ul><a href="/admin/system">לפרטים במסך המערכת ←</a></div>
+<% } %>
+<h1>לוח בקרה</h1>
+<section class="kpis">
+  <div class="kpi kpi-main"><span>סך כל התרומות שהתקבלו</span><strong><%= money(s.total.t) %></strong><small><%= s.total.n %> תרומות · ממוצע <%= money(s.average) %></small></div>
+  <div class="kpi"><span>היום</span><strong><%= money(s.today.t) %></strong><small><%= s.today.n %> תרומות</small></div>
+  <div class="kpi"><span>השבוע</span><strong><%= money(s.week.t) %></strong><small><%= s.week.n %> תרומות</small></div>
+  <div class="kpi"><span>החודש</span><strong><%= money(s.month.t) %></strong><small><%= s.month.n %> תרומות</small></div>
+  <div class="kpi"><span>הוראות קבע פעילות</span><strong><%= s.activeSubs.n %></strong><small><%= money(s.activeSubs.t) %> לחודש</small></div>
+  <div class="kpi <%= (s.counts.pending || s.counts.review) ? 'kpi-alert' : '' %>"><span>ממתינות / לבדיקה</span><strong><%= (s.counts.pending || 0) %> / <%= (s.counts.review || 0) %></strong><small><a href="/admin/donations?status=review">לרשימה</a></small></div>
+</section>
+
+<section class="card">
+  <div class="card-head"><h2>30 הימים האחרונים</h2></div>
+  <% const max = Math.max(1, ...s.daily.map(d => d.t)); const W = 900, H = 200, bw = W / s.daily.length; %>
+  <svg class="chart" viewBox="0 0 <%= W %> <%= H + 24 %>" role="img" aria-label="תרומות יומיות ב-30 הימים האחרונים" preserveAspectRatio="none">
+    <% [0.25, 0.5, 0.75, 1].forEach(g => { %><line x1="0" x2="<%= W %>" y1="<%= H - H * g %>" y2="<%= H - H * g %>" class="grid"/><% }) %>
+    <% s.daily.forEach((d, i) => { const h = Math.max(d.t ? 3 : 0, (d.t / max) * (H - 10)); %>
+      <rect x="<%= i * bw + bw * 0.18 %>" y="<%= H - h %>" width="<%= bw * 0.64 %>" height="<%= h %>" rx="3" class="bar"><title><%= d.key %>: <%= money(d.t) %> (<%= d.n %>)</title></rect>
+      <% if (i % 5 === 0 || i === s.daily.length - 1) { %><text x="<%= i * bw + bw / 2 %>" y="<%= H + 17 %>" class="axis"><%= d.key.slice(8) %>/<%= d.key.slice(5, 7) %></text><% } %>
+    <% }) %>
+  </svg>
+  <p class="chart-max">מקסימום יומי: <%= money(max === 1 ? 0 : max) %></p>
+</section>
+
+<section class="card">
+  <div class="card-head">
+    <h2>סיכומים</h2>
+    <div class="tabs" role="tablist">
+      <button type="button" class="tab on" data-tab="daily">יומי</button>
+      <button type="button" class="tab" data-tab="weekly">שבועי</button>
+      <button type="button" class="tab" data-tab="monthly">חודשי</button>
+    </div>
+  </div>
+  <% [['daily', s.daily.slice(-14).reverse(), 'תאריך'], ['weekly', s.weekly.slice().reverse(), 'שבוע שמתחיל ב-'], ['monthly', s.monthly.slice().reverse(), 'חודש']].forEach(([key, rows, label], idx) => { %>
+  <table class="tbl" data-panel="<%= key %>" <%= idx ? 'hidden' : '' %>>
+    <thead><tr><th><%= label %></th><th>מס' תרומות</th><th>סכום</th></tr></thead>
+    <tbody>
+      <% rows.forEach(r => { %><tr><td dir="ltr" class="ta-r"><%= r.key %></td><td><%= r.n %></td><td><strong><%= money(r.t) %></strong></td></tr><% }) %>
+    </tbody>
+  </table>
+  <% }) %>
+</section>
+
+<section class="card">
+  <div class="card-head"><h2>תרומות אחרונות</h2><a href="/admin/donations">לכל התרומות ←</a></div>
+  <%- include('_rows', { rows: recent }) %>
+</section>
+<script src="/static/js/admin.js?v=<%= assetVersion %>" defer></script>
+<%- include('_bottom') %>

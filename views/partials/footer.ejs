@@ -1,0 +1,34 @@
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div>
+      <a class="brand brand-light" href="/"><img src="/static/img/logo.svg" alt="" width="36" height="36"><span><%= orgName %></span></a>
+      <p class="muted-light"><%= t('footer.secure') %></p>
+      <% if (org.registrationNumber) { %><p class="muted-light small"><%= t('footer.reg') %> <%= org.registrationNumber %></p><% } %>
+    </div>
+    <div>
+      <ul class="footer-links">
+        <li><a href="/#donate"><%= t('nav.donate') %></a></li>
+        <li><a href="/faq"><%= t('nav.faq') %></a></li>
+        <li><a href="/contact"><%= t('nav.contact') %></a></li>
+      </ul>
+    </div>
+    <div>
+      <ul class="footer-links">
+        <li><a href="/privacy"><%= t('footer.privacy') %></a></li>
+        <li><a href="/terms"><%= t('footer.terms') %></a></li>
+        <li><a href="<%= langHref %>" lang="<%= otherLang %>"><%= t('nav.language') %></a></li>
+      </ul>
+    </div>
+    <div class="footer-contact">
+      <% if (org.email) { %><a href="mailto:<%= org.email %>"><%= org.email %></a><% } %>
+      <% if (org.phone) { %><a href="tel:<%= org.phone.replace(/[^+\d]/g, '') %>" dir="ltr"><%= org.phone %></a><% } %>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <span>© <%= new Date().getFullYear() %> <%= orgName %>. <%= t('footer.rights') %></span>
+    <span class="pp-badge"><svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M12 2 4 5v6c0 5 3.4 9.7 8 11 4.6-1.3 8-6 8-11V5l-8-3Zm-1.2 14.2-3.5-3.5 1.4-1.4 2.1 2.1 4.9-4.9 1.4 1.4-6.3 6.3Z"/></svg> PayPal</span>
+  </div>
+</footer>
+<script src="/static/js/main.js?v=<%= assetVersion %>" defer></script>
+</body>
+</html>

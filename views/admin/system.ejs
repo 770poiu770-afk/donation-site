@@ -1,0 +1,44 @@
+<%- include('_top', { title: 'מערכת ו-PayPal' }) %>
+<h1>מערכת ו-PayPal</h1>
+<% if (v.problems.length || v.warnings.length) { %>
+<div class="warn-box"><ul><% v.problems.concat(v.warnings).forEach(w => { %><li><%= w %></li><% }) %></ul></div>
+<% } else { %>
+<div class="ok-box">כל ההגדרות תקינות.</div>
+<% } %>
+<div class="grid2">
+  <section class="card">
+    <h2>חיבור PayPal</h2>
+    <dl class="kv">
+      <dt>מצב</dt><dd><span class="badge <%= info.mode === 'live' ? 'b-completed' : 'b-pending' %>"><%= info.mode === 'live' ? 'LIVE — תשלומים אמיתיים' : info.mode === 'sandbox' ? 'SANDBOX — בדיקות' : 'MOCK — הדגמה מקומית' %></span></dd>
+      <dt>Client ID</dt><dd dir="ltr" class="mono"><%= info.clientId || 'לא הוגדר' %></dd>
+      <dt>Client Secret</dt><dd><%= info.secret ? 'מוגדר ✓ (לא מוצג)' : 'לא הוגדר' %></dd>
+      <dt>Webhook ID</dt><dd dir="ltr" class="mono"><%= info.webhookId || 'לא הוגדר' %></dd>
+      <dt>כתובת Webhook</dt><dd dir="ltr" class="mono"><%= info.webhookUrl %></dd>
+      <dt>תרומות חודשיות</dt><dd><%= info.monthly ? 'פעיל' : 'כבוי' %></dd>
+      <dt>מטבע</dt><dd><%= info.currency %></dd>
+    </dl>
+  </section>
+  <section class="card">
+    <h2>שרת</h2>
+    <dl class="kv">
+      <dt>כתובת האתר</dt><dd dir="ltr" class="mono"><%= info.baseUrl %></dd>
+      <dt>סביבת Production</dt><dd><%= info.production ? 'כן' : 'לא' %></dd>
+      <dt>אזור זמן לדוחות</dt><dd dir="ltr"><%= info.timezone %></dd>
+      <dt>Webhooks שנכשלו בעיבוד</dt><dd><%= failedWebhooks %></dd>
+    </dl>
+    <p class="note">כל המפתחות נשמרים רק במשתני סביבה בשרת ולעולם לא בקוד. כדי לשנות אותם, עדכנו את קובץ ה-<code>.env</code> (או את הגדרות שירות האחסון) והפעילו מחדש.</p>
+  </section>
+</div>
+<section class="card">
+  <h2>Webhooks אחרונים מ-PayPal</h2>
+  <div class="tbl-wrap">
+  <table class="tbl">
+    <thead><tr><th>התקבל</th><th>סוג אירוע</th><th>עובד</th><th>שגיאה</th></tr></thead>
+    <tbody>
+      <% if (!lastWebhook.length) { %><tr><td colspan="4" class="empty">עדיין לא התקבלו Webhooks.</td></tr><% } %>
+      <% lastWebhook.forEach(w => { %><tr><td><%= fmtDate(w.received_at) %></td><td dir="ltr" class="mono ta-r"><%= w.event_type %></td><td><%= w.processed ? '✓' : '✗' %></td><td><%= w.error || '' %></td></tr><% }) %>
+    </tbody>
+  </table>
+  </div>
+</section>
+<%- include('_bottom') %>

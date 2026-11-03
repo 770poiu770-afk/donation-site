@@ -1,0 +1,44 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+<main id="main" class="page page-thanks">
+  <div class="container narrow">
+    <% if (item) {
+      const isSub = kind === 'subscription';
+      const pending = isSub ? item.status !== 'active' : item.status === 'pending';
+      const amount = formatMoney(item.amount_cents);
+      const when = item.completed_at || item.activated_at || item.created_at;
+      const dateStr = new Intl.DateTimeFormat(lang === 'he' ? 'he-IL' : 'en-US', { dateStyle: 'long', timeStyle: 'short', timeZone: 'Asia/Jerusalem' }).format(new Date(when));
+    %>
+    <div class="thanks-card">
+      <div class="thanks-mark" aria-hidden="true"><svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="24"/><path d="M15 27l7 7 15-16"/></svg></div>
+      <h1><%= t('thanks.title') %></h1>
+      <p class="lead"><%= isSub ? t('thanks.leadMonthly', { amount }) : t('thanks.lead', { amount }) %></p>
+      <% if (pending) { %><p class="notice"><%= isSub ? t('thanks.monthlyPending') : t('thanks.pending') %></p><% } %>
+      <dl class="receipt">
+        <div><dt><%= t('thanks.reference') %></dt><dd dir="ltr"><%= item.public_id %></dd></div>
+        <% if (!isSub && item.paypal_capture_id) { %><div><dt><%= t('thanks.transaction') %></dt><dd dir="ltr"><%= item.paypal_capture_id %></dd></div><% } %>
+        <% if (isSub && item.paypal_subscription_id) { %><div><dt>PayPal</dt><dd dir="ltr"><%= item.paypal_subscription_id %></dd></div><% } %>
+        <div><dt><%= t('thanks.date') %></dt><dd><%= dateStr %></dd></div>
+      </dl>
+      <p class="muted"><%= t('thanks.receipt') %></p>
+      <div class="share">
+        <p><%= t('thanks.share') %></p>
+        <div class="share-row">
+          <a class="share-btn" href="https://wa.me/?text=<%= encodeURIComponent(c.heroTitle + ' ' + baseUrl) %>" target="_blank" rel="noopener">WhatsApp</a>
+          <a class="share-btn" href="https://www.facebook.com/sharer/sharer.php?u=<%= encodeURIComponent(baseUrl) %>" target="_blank" rel="noopener">Facebook</a>
+          <a class="share-btn" href="https://twitter.com/intent/tweet?url=<%= encodeURIComponent(baseUrl) %>&text=<%= encodeURIComponent(c.heroTitle) %>" target="_blank" rel="noopener">X</a>
+          <button class="share-btn" type="button" data-copy="<%= baseUrl %>" data-copied="<%= t('thanks.copied') %>"><%= t('thanks.copy') %></button>
+        </div>
+      </div>
+      <a class="btn btn-ink" href="/"><%= t('thanks.back') %></a>
+    </div>
+    <% } else { %>
+    <div class="thanks-card">
+      <h1><%= t('thanks.notFound') %></h1>
+      <p class="lead"><%= t('thanks.notFoundText') %></p>
+      <a class="btn btn-ink" href="/contact"><%= t('nav.contact') %></a>
+    </div>
+    <% } %>
+  </div>
+</main>
+<%- include('partials/footer') %>

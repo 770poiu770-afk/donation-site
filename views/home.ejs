@@ -1,0 +1,106 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+<main id="main">
+  <section class="hero" id="donate">
+    <div class="hero-bg" aria-hidden="true"></div>
+    <div class="container hero-grid">
+      <div class="hero-head">
+        <p class="eyebrow"><%= c.heroEyebrow %></p>
+        <h1 class="hero-title"><%= c.heroTitle %></h1>
+      </div>
+      <div class="hero-more">
+        <p class="hero-text"><%= c.heroText %></p>
+        <ul class="trust">
+          <li><%- include('partials/icon', { name: 'shield', size: 18 }) %><%= t('home.trust1') %></li>
+          <li><%- include('partials/icon', { name: 'card', size: 18 }) %><%= t('home.trust2') %></li>
+          <li><%- include('partials/icon', { name: 'user', size: 18 }) %><%= t('home.trust3') %></li>
+        </ul>
+      </div>
+      <div class="hero-donate">
+        <%- include('partials/donate-widget') %>
+      </div>
+    </div>
+  </section>
+
+  <% if (stats.show) { %>
+  <section class="stats" aria-label="Impact so far">
+    <div class="container stats-grid">
+      <div class="stat reveal"><strong data-count="<%= Math.round(stats.totalCents / 100) %>" data-prefix="$" dir="ltr"><%= formatMoney(stats.totalCents) %></strong><span><%= t('home.raised') %></span></div>
+      <div class="stat reveal"><strong data-count="<%= stats.count %>"><%= stats.count.toLocaleString('en-US') %></strong><span><%= t('home.donors') %></span></div>
+      <% if (stats.monthly) { %><div class="stat reveal"><strong data-count="<%= stats.monthly %>"><%= stats.monthly %></strong><span><%= t('home.monthlyDonors') %></span></div><% } %>
+    </div>
+  </section>
+  <% } %>
+
+  <section class="section" id="mission">
+    <div class="container narrow center">
+      <p class="eyebrow reveal"><%= orgName %></p>
+      <h2 class="section-title reveal"><%= c.missionTitle %></h2>
+      <p class="lead reveal"><%= c.missionText %></p>
+    </div>
+    <div class="container">
+      <h3 class="sub-title center reveal"><%= t('home.programsTitle') %></h3>
+      <div class="programs">
+        <% (c.programs || []).forEach((p) => { %>
+        <article class="program reveal">
+          <span class="program-icon"><%- include('partials/icon', { name: p.icon, size: 26 }) %></span>
+          <h4><%= p.title %></h4>
+          <p><%= p.text %></p>
+        </article>
+        <% }) %>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-ink" id="impact">
+    <div class="container split">
+      <div>
+        <h2 class="section-title light reveal"><%= c.fundsTitle %></h2>
+        <p class="lead light reveal"><%= c.fundsText %></p>
+        <ul class="funds">
+          <% (c.funds || []).forEach((f, i) => { %>
+          <li class="reveal">
+            <span class="fund-dot" style="--i:<%= i %>"></span>
+            <span class="fund-label"><%= f.label %></span>
+            <% if (f.percent != null) { %><span class="fund-pct" dir="ltr"><%= f.percent %>%</span>
+            <span class="fund-bar"><span style="--w:<%= f.percent %>%"></span></span><% } %>
+          </li>
+          <% }) %>
+        </ul>
+      </div>
+      <div>
+        <h2 class="section-title light reveal"><%= c.impactTitle %></h2>
+        <div class="impact-list">
+          <% (c.impactExamples || []).forEach((e) => { %>
+          <button type="button" class="impact reveal" data-pick-amount="<%= e.amount %>">
+            <span class="impact-amt" dir="ltr">$<%= e.amount.toLocaleString('en-US') %></span>
+            <span class="impact-text"><%= e.text %></span>
+            <span class="impact-cta"><%= t('home.giveCta') %> →</span>
+          </button>
+          <% }) %>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="faq">
+    <div class="container narrow">
+      <h2 class="section-title center reveal"><%= t('faq.title') %></h2>
+      <%- include('partials/faq-list') %>
+    </div>
+  </section>
+
+  <section class="section section-soft" id="contact">
+    <div class="container">
+      <%- include('partials/contact-block', { sent: false, error: false, form: {} }) %>
+    </div>
+  </section>
+
+  <section class="cta-band">
+    <div class="container cta-inner reveal">
+      <h2><%= c.heroTitle %></h2>
+      <a class="btn btn-gold btn-lg" href="#donate"><%= t('nav.donate') %></a>
+    </div>
+  </section>
+</main>
+<%- include('partials/footer') %>

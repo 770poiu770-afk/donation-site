@@ -1,0 +1,19 @@
+<%- include('_top', { title: 'פניות' }) %>
+<h1>פניות מטופס יצירת הקשר</h1>
+<% if (!rows.length) { %><section class="card"><p class="empty">אין פניות עדיין.</p></section><% } %>
+<div class="messages">
+<% rows.forEach(m => { %>
+  <article class="card msg <%= m.is_read ? '' : 'unread' %>">
+    <header>
+      <strong><%= m.name %></strong> · <a dir="ltr" href="mailto:<%= m.email %>?subject=<%= encodeURIComponent('Re: ' + (m.subject || '')) %>"><%= m.email %></a>
+      <time><%= fmtDate(m.created_at) %></time>
+    </header>
+    <% if (m.subject) { %><h3><%= m.subject %></h3><% } %>
+    <p class="pre"><%= m.message %></p>
+    <% if (!m.is_read) { %>
+    <form method="post" action="/admin/messages/<%= m.id %>/read"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="btn btn-ghost btn-sm" type="submit">סימון כנקרא</button></form>
+    <% } %>
+  </article>
+<% }) %>
+</div>
+<%- include('_bottom') %>

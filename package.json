@@ -1,0 +1,31 @@
+{
+  "name": "donation-site",
+  "version": "1.0.0",
+  "description": "Donation website with PayPal (one-time & monthly), admin dashboard",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "demo": "node scripts/demo.js",
+    "test": "node --test --test-concurrency=1 test/server.test.js",
+    "check": "node scripts/check.js",
+    "admin:password": "node scripts/admin-password.js",
+    "paypal:webhook": "node scripts/paypal-webhook.js",
+    "backup": "node scripts/backup.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "better-sqlite3": "^13.0.3",
+    "compression": "^1.8.2",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^18.0.9",
+    "ejs": "^7.0.2",
+    "express": "^4.22.3",
+    "express-rate-limit": "^8.7.3",
+    "helmet": "^8.3.0"
+  },
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  }
+}

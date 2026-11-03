@@ -1,0 +1,19 @@
+<header class="site-header" data-header>
+  <div class="container header-inner">
+    <a class="brand" href="/" aria-label="<%= orgName %>">
+      <img src="/static/img/logo.svg" alt="" width="40" height="40">
+      <span><%= orgName %></span>
+    </a>
+    <nav class="main-nav" id="main-nav" data-nav aria-label="Main">
+      <a href="/#mission"><%= t('nav.mission') %></a>
+      <a href="/#impact"><%= t('nav.impact') %></a>
+      <a href="/faq"><%= t('nav.faq') %></a>
+      <a href="/contact"><%= t('nav.contact') %></a>
+      <a class="lang-switch" href="<%= langHref %>" hreflang="<%= otherLang %>" lang="<%= otherLang %>"><%= t('nav.language') %></a>
+    </nav>
+    <a class="btn btn-gold btn-sm header-cta" href="/#donate"><%= t('nav.donate') %></a>
+    <button class="nav-toggle" type="button" aria-controls="main-nav" aria-expanded="false" data-nav-toggle>
+      <span></span><span></span><span></span><span class="sr-only">Menu</span>
+    </button>
+  </div>
+</header>
