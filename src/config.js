@@ -21,7 +21,7 @@ const mode = (env.PAYPAL_MODE || 'sandbox').toLowerCase();
 const config = {
   isProduction,
   port: parseInt(env.PORT || '3000', 10),
-  baseUrl: (env.BASE_URL || `http://localhost:${env.PORT || 3000}`).replace(/\/+$/, ''),
+  baseUrl: (env.BASE_URL || env.RENDER_EXTERNAL_URL || `http://localhost:${env.PORT || 3000}`).replace(/\/+$/, ''),
   trustProxy: env.TRUST_PROXY ? (isNaN(Number(env.TRUST_PROXY)) ? env.TRUST_PROXY : Number(env.TRUST_PROXY)) : (isProduction ? 1 : false),
   timezone: env.TIMEZONE || 'Asia/Jerusalem',
   currency: (env.CURRENCY || 'USD').toUpperCase(),
@@ -41,6 +41,7 @@ const config = {
   admin: {
     username: env.ADMIN_USERNAME || 'admin',
     passwordHash: env.ADMIN_PASSWORD_HASH || '',
+    plainPassword: env.ADMIN_PASSWORD || '',
   },
 
   sessionSecret: env.SESSION_SECRET || '',
@@ -75,7 +76,7 @@ config.validate = () => {
   if (!['sandbox', 'live', 'mock'].includes(mode)) problems.push('PAYPAL_MODE must be sandbox, live or mock');
   if (mode === 'mock' && isProduction) problems.push('PAYPAL_MODE=mock is not allowed in production');
   if (!config.paypalConfigured()) (isProduction ? problems : warnings).push('PAYPAL_CLIENT_ID / PAYPAL_CLIENT_SECRET are not set');
-  if (!config.paypal.webhookId) (isProduction ? problems : warnings).push('PAYPAL_WEBHOOK_ID is not set — webhooks cannot be verified and will be rejected');
+  if (!config.paypal.webhookId) warnings.push('PAYPAL_WEBHOOK_ID is not set — PayPal webhooks are rejected until it is set (payments still work)');
   if (!config.sessionSecret || config.sessionSecret.length < 32) {
     if (isProduction) problems.push('SESSION_SECRET must be at least 32 characters');
     else {
@@ -83,7 +84,11 @@ config.validate = () => {
       config.sessionSecret = require('crypto').randomBytes(32).toString('hex');
     }
   }
-  if (!config.admin.passwordHash) (isProduction ? problems : warnings).push('ADMIN_PASSWORD_HASH is not set — admin login is disabled (run: npm run admin:password)');
+  if (!config.admin.passwordHash && config.admin.plainPassword) {
+    if (config.admin.plainPassword.length < 12) problems.push('ADMIN_PASSWORD must be at least 12 characters');
+    else config.admin.passwordHash = require('bcryptjs').hashSync(config.admin.plainPassword, 12);
+  }
+  if (!config.admin.passwordHash) (isProduction ? problems : warnings).push('ADMIN_PASSWORD (or ADMIN_PASSWORD_HASH) is not set — admin login is disabled');
   if (isProduction && !config.baseUrl.startsWith('https://')) problems.push('BASE_URL must start with https:// in production');
   return { problems, warnings };
 };
