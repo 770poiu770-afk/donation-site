@@ -103,7 +103,7 @@ function applyCapture(donation, capture, extra = {}) {
 /* one-time donations (Orders API v2)                                  */
 /* ------------------------------------------------------------------ */
 
-async function startOneTime({ amountCents, currency = config.currency, details, lang }) {
+async function startOneTime({ amountCents, currency = config.currency, details, lang, redirect = false }) {
   const donation = db.createDonation({ type: 'one_time', amountCents, currency, lang, ...cleanOptional(details) });
   db.audit({ donationId: donation.id, event: 'order:create:request', details: { amountCents } });
   try {
@@ -112,10 +112,18 @@ async function startOneTime({ amountCents, currency = config.currency, details, 
       currency: donation.currency,
       publicId: donation.public_id,
       description: description('one_time'),
+      redirect: redirect
+        ? {
+            locale: lang === 'he' ? 'he-IL' : 'en-US',
+            returnUrl: `${config.baseUrl}/paypal/return`,
+            cancelUrl: `${config.baseUrl}/paypal/cancel`,
+          }
+        : undefined,
     });
     db.updateDonation(donation.id, { paypal_order_id: order.id });
-    db.audit({ donationId: donation.id, event: 'order:created', details: { orderId: order.id, status: order.status } });
-    return { orderId: order.id, publicId: donation.public_id };
+    db.audit({ donationId: donation.id, event: 'order:created', details: { orderId: order.id, status: order.status, redirect } });
+    const approveUrl = (order.links || []).find((l) => l.rel === 'payer-action' || l.rel === 'approve')?.href;
+    return { orderId: order.id, publicId: donation.public_id, approveUrl };
   } catch (err) {
     db.updateDonation(donation.id, { status: 'failed', failure_reason: `Order creation failed: ${err.message}`.slice(0, 500) });
     db.audit({ donationId: donation.id, event: 'order:create:error', details: { message: err.message, debugId: err.debugId } });

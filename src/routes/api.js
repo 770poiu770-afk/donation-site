@@ -43,6 +43,23 @@ router.post('/orders', async (req, res) => {
   }
 });
 
+// Full-page PayPal checkout (opens on the card form). Returns the PayPal URL to redirect to.
+router.post('/orders/redirect', async (req, res) => {
+  const amount = parseAmount(req.body?.amount);
+  if (!amount.ok) return res.status(400).json({ error: amount.error });
+  const currency = pickCurrency(req.body?.currency);
+  if (!currency) return res.status(400).json({ error: 'currency_invalid' });
+  try {
+    const r = await donations.startOneTime({ amountCents: amount.cents, currency, details: req.body?.details, lang: lang(req.body?.lang), redirect: true });
+    if (!r.approveUrl || !/^https:\/\/([a-z0-9-]+\.)*paypal\.com\//i.test(r.approveUrl) && config.paypal.mode !== 'mock') {
+      return res.status(502).json({ error: 'paypal_error' });
+    }
+    res.status(201).json({ id: r.orderId, url: r.approveUrl });
+  } catch (err) {
+    fail(res, err);
+  }
+});
+
 router.post('/orders/:id/capture', async (req, res) => {
   if (!PAYPAL_ID.test(req.params.id)) return res.status(400).json({ error: 'bad_id' });
   try {

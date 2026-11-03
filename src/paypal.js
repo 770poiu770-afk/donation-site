@@ -66,7 +66,7 @@ function brandName() {
   return config.paypal.brandName || config.site.org.name?.en || 'Donation';
 }
 
-function createOrder({ amountValue, currency, publicId, description }) {
+function createOrder({ amountValue, currency, publicId, description, redirect }) {
   return request('POST', '/v2/checkout/orders', {
     requestId: `${publicId}-create`,
     body: {
@@ -88,11 +88,30 @@ function createOrder({ amountValue, currency, publicId, description }) {
           unit_amount: { currency_code: currency, value: amountValue },
         }],
       }],
-      application_context: {
-        brand_name: brandName().slice(0, 127),
-        shipping_preference: 'NO_SHIPPING',
-        user_action: 'PAY_NOW',
-      },
+      ...(redirect
+        ? {
+            // Full-page PayPal checkout that opens on the card form (guest checkout)
+            payment_source: {
+              paypal: {
+                experience_context: {
+                  brand_name: brandName().slice(0, 127),
+                  shipping_preference: 'NO_SHIPPING',
+                  user_action: 'PAY_NOW',
+                  landing_page: 'GUEST_CHECKOUT',
+                  locale: redirect.locale,
+                  return_url: redirect.returnUrl,
+                  cancel_url: redirect.cancelUrl,
+                },
+              },
+            },
+          }
+        : {
+            application_context: {
+              brand_name: brandName().slice(0, 127),
+              shipping_preference: 'NO_SHIPPING',
+              user_action: 'PAY_NOW',
+            },
+          }),
     },
   });
 }

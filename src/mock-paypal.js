@@ -37,6 +37,13 @@ function createMockPayPal() {
     const pu = req.body.purchase_units?.[0];
     if (!pu?.amount?.value) return res.status(400).json({ name: 'INVALID_REQUEST', details: [{ issue: 'MISSING_REQUIRED_PARAMETER' }] });
     const o = { id: id('ORD'), status: 'CREATED', intent: 'CAPTURE', purchase_units: [{ ...pu, payments: undefined }], create_time: new Date().toISOString() };
+    const ctx = req.body.payment_source?.paypal?.experience_context;
+    if (ctx) {
+      o.status = 'PAYER_ACTION_REQUIRED';
+      o.redirect = { returnUrl: ctx.return_url, cancelUrl: ctx.cancel_url };
+    }
+    const base = `${req.protocol}://${req.get('host')}${req.baseUrl}`;
+    o.links = [{ rel: ctx ? 'payer-action' : 'approve', href: `${base}/__buyer/checkout/${o.id}`, method: 'GET' }];
     state.orders.set(o.id, o);
     remember(req, res, () => state.orders.get(o.id));
     res.status(201).json(o);
@@ -124,6 +131,27 @@ function createMockPayPal() {
     s.status = 'ACTIVE';
     s.subscriber = { ...payer(false) };
     res.json({ ok: true });
+  });
+
+  // Full-page checkout imitation (guest card form)
+  router.get('/__buyer/checkout/:id', (req, res) => {
+    const o = state.orders.get(req.params.id);
+    if (!o?.redirect) return res.status(404).send('unknown order');
+    res.type('html').send(`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width">
+      <title>Mock PayPal</title><body style="font:16px system-ui;max-width:420px;margin:40px auto;padding:0 16px">
+      <h1 style="color:#003087">PayPal <small style="font-size:12px;color:#b00">DEMO</small></h1>
+      <p>Pay with debit or credit card — ${o.purchase_units[0].amount.value} ${o.purchase_units[0].amount.currency_code}</p>
+      <p><a id="approve" href="${req.baseUrl}/__buyer/approve-redirect/${o.id}">Pay now</a></p>
+      <p><a id="decline" href="${req.baseUrl}/__buyer/approve-redirect/${o.id}?decline=1">Simulate declined card</a></p>
+      <p><a id="cancel" href="${o.redirect.cancelUrl}?token=${o.id}">Cancel and return</a></p>`);
+  });
+  router.get('/__buyer/approve-redirect/:id', (req, res) => {
+    const o = state.orders.get(req.params.id);
+    if (!o?.redirect) return res.status(404).send('unknown order');
+    o.status = 'APPROVED';
+    o.payer = payer(true);
+    if (req.query.decline) o.decline = true;
+    res.redirect(302, `${o.redirect.returnUrl}?token=${o.id}&PayerID=${o.payer.payer_id}`);
   });
 
   router.get('/sdk.js', (req, res) => {

@@ -4,6 +4,7 @@ const rateLimit = require('express-rate-limit');
 const config = require('../config');
 const db = require('../db');
 const { formatMoney } = require('../amounts');
+const donations = require('../donations');
 
 const router = express.Router();
 
@@ -77,6 +78,25 @@ router.get('/thank-you', (req, res) => {
   res.set('Cache-Control', 'no-store');
   res.set('X-Robots-Tag', 'noindex');
   res.render('thank-you', { item: visible ? item : null, kind, pageTitle: res.locals.t('thanks.title') });
+});
+
+// Return from the full-page PayPal checkout
+router.get('/paypal/return', async (req, res) => {
+  const token = String(req.query.token || '');
+  if (!/^[A-Z0-9-]{6,64}$/i.test(token)) return res.redirect(303, '/#donate');
+  try {
+    const r = await donations.captureOneTime(token);
+    if (r.ok) return res.redirect(303, `/thank-you?d=${encodeURIComponent(r.publicId)}`);
+    return res.redirect(303, `/?payment=${r.restart ? 'declined' : 'failed'}#donate`);
+  } catch (err) {
+    console.error('[paypal/return]', err.message);
+    return res.redirect(303, '/?payment=failed#donate');
+  }
+});
+router.get('/paypal/cancel', (req, res) => {
+  const token = String(req.query.token || '');
+  if (/^[A-Z0-9-]{6,64}$/i.test(token)) donations.cancelOneTime(token);
+  res.redirect(303, '/?payment=cancelled#donate');
 });
 
 router.get('/faq', (req, res) => res.render('faq', { pageTitle: res.locals.t('faq.title') }));

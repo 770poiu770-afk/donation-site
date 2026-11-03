@@ -385,3 +385,36 @@ test('Hebrew page defaults to shekels, English to dollars', async () => {
   assert.match(he, /value="ILS" checked/);
   assert.match(en, /value="USD" checked/);
 });
+
+/* ---------------- full-page card checkout (redirect) ---------------- */
+test('full-page PayPal card checkout: redirect → return → captured', async () => {
+  const r = await json('/api/orders/redirect', { amount: '50', currency: 'ILS', lang: 'he' });
+  assert.equal(r.status, 201);
+  assert.match(r.body.url, /__buyer\/checkout\//);
+  // buyer pays on PayPal's page, PayPal sends them back to /paypal/return
+  const pay = await fetch(`${B}/__mock-paypal/__buyer/approve-redirect/${r.body.id}`, { redirect: 'manual' });
+  const back = pay.headers.get('location');
+  assert.match(back, /\/paypal\/return\?token=/);
+  const ret = await fetch(back, { redirect: 'manual' });
+  assert.equal(ret.status, 303);
+  assert.match(ret.headers.get('location'), /^\/thank-you\?d=don_/);
+  const d = db.getDonationByOrderId(r.body.id);
+  assert.equal(d.status, 'completed');
+  assert.equal(d.currency, 'ILS');
+  assert.equal(d.amount_cents, 5000);
+});
+
+test('full-page checkout: cancel and declined return safely', async () => {
+  const a = await json('/api/orders/redirect', { amount: '20' });
+  const c = await fetch(`${B}/paypal/cancel?token=${a.body.id}`, { redirect: 'manual' });
+  assert.match(c.headers.get('location'), /payment=cancelled/);
+  assert.equal(db.getDonationByOrderId(a.body.id).status, 'cancelled');
+  const b = await json('/api/orders/redirect', { amount: '20' });
+  const pay = await fetch(`${B}/__mock-paypal/__buyer/approve-redirect/${b.body.id}?decline=1`, { redirect: 'manual' });
+  const ret = await fetch(pay.headers.get('location'), { redirect: 'manual' });
+  assert.match(ret.headers.get('location'), /payment=declined/);
+  assert.notEqual(db.getDonationByOrderId(b.body.id).status, 'completed');
+  // forged return for an unknown order does nothing
+  const f = await fetch(`${B}/paypal/return?token=ORDNOTREAL123`, { redirect: 'manual' });
+  assert.match(f.headers.get('location'), /payment=failed/);
+});

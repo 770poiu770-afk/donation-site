@@ -33,7 +33,8 @@
     "errUnavailable": "Online donations are temporarily unavailable. Please try again soon.",
     "cancelled": "Payment was cancelled. You were not charged.",
     "chooseMethod": "Choose how to pay",
-    "currency": "Currency"
+    "currency": "Currency",
+    "altCard": "Card not going through? Pay by card on PayPal’s secure page →"
   },
   "errors": {
     "amount_required": "Please choose an amount.",

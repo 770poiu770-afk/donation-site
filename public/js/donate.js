@@ -283,6 +283,30 @@
     }
   }
 
+  /* ---------------- full-page PayPal card checkout (fallback) ---------------- */
+  const altBtn = $('[data-redirect-card]');
+  function syncAlt() { if (altBtn) altBtn.hidden = freq !== 'one_time'; }
+  $$('input[name="freq"]').forEach((r) => r.addEventListener('change', syncAlt));
+  if (altBtn) {
+    altBtn.addEventListener('click', async () => {
+      const c = currentCents();
+      if (!valid(c)) { showMsg(T.errAmount); customInput.focus(); return; }
+      hideMsg();
+      busy(true);
+      const r = await post('/api/orders/redirect', { amount: (c / 100).toFixed(2), currency, details: details(), lang: cfg.lang });
+      if (r.ok && r.data.url) { window.location.href = r.data.url; return; }
+      busy(false);
+      showMsg(ERR[r.data.error] || T.errGeneric);
+    });
+  }
+  syncAlt();
+
+  // Messages after returning from the full-page checkout
+  const back = new URLSearchParams(window.location.search).get('payment');
+  if (back === 'cancelled') showMsg(T.cancelled, true);
+  else if (back === 'declined') showMsg(T.errDeclined);
+  else if (back === 'failed') showMsg(T.errGeneric);
+
   refresh(false);
   showButtons();
 })();

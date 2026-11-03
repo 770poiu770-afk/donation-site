@@ -195,6 +195,9 @@ p { margin: 0 0 1em; }
 .optional-body input:focus, .optional-body textarea:focus, .contact-form input:focus, .contact-form textarea:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 4px rgba(201, 165, 76, .18); }
 
 .pay-area { position: relative; min-height: 112px; }
+.alt-card { display: block; width: 100%; margin: 4px 0 0; padding: 10px 12px; border: 1.5px dashed var(--line); border-radius: 12px; background: #fff; color: var(--ink-3); font: 600 .9rem var(--body); cursor: pointer; transition: border-color .2s, background .2s; }
+.alt-card:hover { border-color: var(--gold); background: #fffaf0; }
+.pay-area:not(.ready) .alt-card { display: none; }
 .pp-buttons { position: relative; z-index: 1; }
 .pp-loading { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 112px; color: var(--muted); font-size: .92rem; }
 .pay-area.ready .pp-loading { display: none; }
