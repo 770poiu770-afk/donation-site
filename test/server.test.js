@@ -342,3 +342,46 @@ test('no secrets in served assets', async () => {
   const html = await fetch(`${B}/`).then((r) => r.text());
   assert.doesNotMatch(html, /mock-secret|CLIENT_SECRET|clientSecret/);
 });
+
+/* ---------------- currencies (₪ / $) ---------------- */
+test('donation in shekels (ILS) end to end', async () => {
+  const c = await json('/api/orders', { amount: '180', currency: 'ILS' });
+  assert.equal(c.status, 201);
+  await approve(c.body.id);
+  const cap = await json(`/api/orders/${c.body.id}/capture`, {});
+  assert.equal(cap.body.status, 'completed');
+  const d = db.getDonationByOrderId(c.body.id);
+  assert.equal(d.currency, 'ILS');
+  assert.equal(d.amount_cents, 18000);
+  const page = await fetch(`${B}${cap.body.redirect}&lang=he`).then((r) => r.text());
+  assert.match(page, /₪/);
+});
+
+test('unsupported currency is rejected', async () => {
+  assert.equal((await json('/api/orders', { amount: '10', currency: 'EUR' })).status, 400);
+  assert.equal((await json('/api/subscriptions', { amount: '10', currency: 'XYZ' })).status, 400);
+});
+
+test('monthly in shekels uses its own PayPal plan', async () => {
+  const usd = await json('/api/subscriptions', { amount: '50', currency: 'USD' });
+  const ils = await json('/api/subscriptions', { amount: '50', currency: 'ILS' });
+  const a = db.getSubscriptionByPaypalId(usd.body.id);
+  const b = db.getSubscriptionByPaypalId(ils.body.id);
+  assert.equal(b.currency, 'ILS');
+  assert.notEqual(a.paypal_plan_id, b.paypal_plan_id);
+});
+
+test('admin reports never mix currencies', async () => {
+  const cookie = await login();
+  const html = await fetch(`${B}/admin?cur=ILS`, { headers: { Cookie: cookie } }).then((r) => r.text());
+  assert.match(html, /₪/);
+  const list = await fetch(`${B}/admin/donations?currency=ILS`, { headers: { Cookie: cookie } }).then((r) => r.text());
+  assert.doesNotMatch(list.split('result-line')[1].split('</p>')[0], /\$/);
+});
+
+test('Hebrew page defaults to shekels, English to dollars', async () => {
+  const he = await fetch(`${B}/?lang=he`).then((r) => r.text());
+  const en = await fetch(`${B}/?lang=en`).then((r) => r.text());
+  assert.match(he, /value="ILS" checked/);
+  assert.match(en, /value="USD" checked/);
+});

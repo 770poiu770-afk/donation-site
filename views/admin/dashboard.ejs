@@ -2,7 +2,18 @@
 <% if (warnings.length) { %>
 <div class="warn-box"><strong>לתשומת לבך:</strong><ul><% warnings.forEach(w => { %><li><%= w %></li><% }) %></ul><a href="/admin/system">לפרטים במסך המערכת ←</a></div>
 <% } %>
-<h1>לוח בקרה</h1>
+<div class="dash-head">
+  <h1>לוח בקרה</h1>
+  <% if (currencies.length > 1) { %>
+  <nav class="chips" aria-label="מטבע">
+    <% currencies.forEach(c => { %><a href="?cur=<%= c %>" class="<%= c === cur ? 'on' : '' %>"><%= c === 'ILS' ? '₪ שקלים' : c === 'USD' ? '$ דולרים' : c %></a><% }) %>
+  </nav>
+  <% } %>
+</div>
+<% if (s.otherCurrencies.length) { %>
+<p class="note">מוצגים נתונים ב-<%= cur === 'ILS' ? 'שקלים' : cur === 'USD' ? 'דולרים' : cur %>. בנוסף התקבלו:
+  <% s.otherCurrencies.forEach((o, i) => { %><%= i ? ' · ' : '' %><a href="?cur=<%= o.currency %>"><strong dir="ltr"><%= money(o.t, o.currency) %></strong> (<%= o.n %> תרומות)</a><% }) %></p>
+<% } %>
 <section class="kpis">
   <div class="kpi kpi-main"><span>סך כל התרומות שהתקבלו</span><strong><%= money(s.total.t) %></strong><small><%= s.total.n %> תרומות · ממוצע <%= money(s.average) %></small></div>
   <div class="kpi"><span>היום</span><strong><%= money(s.today.t) %></strong><small><%= s.today.n %> תרומות</small></div>

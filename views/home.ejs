@@ -25,7 +25,9 @@
   <% if (stats.show) { %>
   <section class="stats" aria-label="Impact so far">
     <div class="container stats-grid">
-      <div class="stat reveal"><strong data-count="<%= Math.round(stats.totalCents / 100) %>" data-prefix="$" dir="ltr"><%= formatMoney(stats.totalCents) %></strong><span><%= t('home.raised') %></span></div>
+      <% stats.totals.forEach((tt) => { %>
+      <div class="stat reveal"><strong data-count="<%= Math.round(tt.cents / 100) %>" data-prefix="<%= currencySymbol[tt.currency] || '' %>" dir="ltr"><%= formatMoney(tt.cents, tt.currency) %></strong><span><%= t('home.raised') %></span></div>
+      <% }) %>
       <div class="stat reveal"><strong data-count="<%= stats.count %>"><%= stats.count.toLocaleString('en-US') %></strong><span><%= t('home.donors') %></span></div>
       <% if (stats.monthly) { %><div class="stat reveal"><strong data-count="<%= stats.monthly %>"><%= stats.monthly %></strong><span><%= t('home.monthlyDonors') %></span></div><% } %>
     </div>

@@ -1,5 +1,13 @@
 {
-  "nav": { "home": "Home", "mission": "Mission", "impact": "Impact", "faq": "FAQ", "contact": "Contact", "donate": "Donate Now", "language": "עברית" },
+  "nav": {
+    "home": "Home",
+    "mission": "Mission",
+    "impact": "Impact",
+    "faq": "FAQ",
+    "contact": "Contact",
+    "donate": "Donate Now",
+    "language": "עברית"
+  },
   "donate": {
     "title": "Make a donation",
     "oneTime": "One-time",
@@ -19,18 +27,20 @@
     "message": "Personal message",
     "processing": "Processing your donation…",
     "loadingPayPal": "Loading secure checkout…",
-    "errAmount": "Please choose or enter an amount between $1 and $1,000,000.",
+    "errAmount": "Please choose or enter an amount between 1 and 1,000,000.",
     "errGeneric": "Something went wrong. You were not charged. Please try again.",
     "errDeclined": "Your payment method was declined. Please try another card or method.",
     "errUnavailable": "Online donations are temporarily unavailable. Please try again soon.",
     "cancelled": "Payment was cancelled. You were not charged.",
-    "chooseMethod": "Choose how to pay"
+    "chooseMethod": "Choose how to pay",
+    "currency": "Currency"
   },
   "errors": {
     "amount_required": "Please choose an amount.",
     "amount_invalid": "Please enter a valid amount.",
-    "amount_too_small": "The minimum donation is $1.",
-    "amount_too_large": "The maximum donation is $1,000,000."
+    "amount_too_small": "The minimum donation is 1.",
+    "amount_too_large": "The maximum donation is 1,000,000.",
+    "currency_invalid": "Please choose a currency."
   },
   "home": {
     "raised": "raised by donors so far",
@@ -73,7 +83,9 @@
     "address": "Address",
     "whatsapp": "WhatsApp"
   },
-  "faq": { "title": "Frequently asked questions" },
+  "faq": {
+    "title": "Frequently asked questions"
+  },
   "footer": {
     "privacy": "Privacy Policy",
     "terms": "Terms of Use",
@@ -81,5 +93,9 @@
     "rights": "All rights reserved.",
     "secure": "Donations are processed securely by PayPal."
   },
-  "notFound": { "title": "Page not found", "text": "The page you are looking for does not exist.", "back": "Back to home" }
+  "notFound": {
+    "title": "Page not found",
+    "text": "The page you are looking for does not exist.",
+    "back": "Back to home"
+  }
 }

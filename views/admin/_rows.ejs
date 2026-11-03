@@ -9,7 +9,7 @@
     <tr class="clickable" data-href="/admin/donations/<%= r.id %>">
       <td><%= fmtDate(r.completed_at || r.created_at) %></td>
       <td><a href="/admin/donations/<%= r.id %>"><%= name || 'אנונימי' %></a><% if (email) { %><div class="sub" dir="ltr"><%= email %></div><% } %></td>
-      <td><strong dir="ltr"><%= money(r.amount_cents) %></strong><% if (r.refunded_cents) { %><div class="sub">הוחזר <%= money(r.refunded_cents) %></div><% } %></td>
+      <td><strong dir="ltr"><%= money(r.amount_cents, r.currency) %></strong><% if (r.refunded_cents) { %><div class="sub">הוחזר <%= money(r.refunded_cents, r.currency) %></div><% } %></td>
       <td><%= r.type === 'monthly' ? 'חודשית' : 'חד-פעמית' %></td>
       <td><span class="badge b-<%= r.status %>"><%= statusLabel[r.status] || r.status %></span></td>
       <td dir="ltr" class="mono ta-r"><%= r.paypal_capture_id || r.paypal_order_id || '—' %></td>

@@ -138,15 +138,16 @@ p { margin: 0 0 1em; }
 .donate-card::before { content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1px; background: linear-gradient(140deg, rgba(201, 165, 76, .7), transparent 40%); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
 .donate-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
 .donate-title { font-size: 1.45rem; margin: 0; }
-.freq { position: relative; display: inline-grid; grid-template-columns: 1fr 1fr; background: var(--soft); border-radius: 999px; padding: 4px; }
+.toggles { display: flex; gap: 8px; flex-wrap: wrap; }
+.freq { position: relative; display: inline-grid; grid-template-columns: repeat(var(--n, 2), 1fr); background: var(--soft); border-radius: 999px; padding: 4px; }
 .freq-opt { position: relative; z-index: 1; cursor: pointer; }
 .freq-opt input { position: absolute; opacity: 0; pointer-events: none; }
 .freq-opt span { display: block; padding: 8px 16px; font-weight: 600; font-size: .9rem; color: var(--muted); text-align: center; transition: color .25s; white-space: nowrap; }
 .freq-opt input:checked + span { color: var(--ink); }
 .freq-opt input:focus-visible + span { outline: 3px solid var(--gold); border-radius: 999px; }
-.freq-glider { position: absolute; top: 4px; bottom: 4px; inset-inline-start: 4px; width: calc(50% - 4px); background: #fff; border-radius: 999px; box-shadow: var(--shadow-sm); transition: transform .35s var(--ease); }
-.freq.is-monthly .freq-glider { transform: translateX(100%); }
-[dir="rtl"] .freq.is-monthly .freq-glider { transform: translateX(-100%); }
+.freq-glider { position: absolute; top: 4px; bottom: 4px; inset-inline-start: 4px; width: calc((100% - 8px) / var(--n, 2)); background: #fff; border-radius: 999px; box-shadow: var(--shadow-sm); transition: transform .35s var(--ease); transform: translateX(calc(var(--i, 0) * 100%)); }
+[dir="rtl"] .freq-glider { transform: translateX(calc(var(--i, 0) * -100%)); }
+.cur-toggle .freq-opt span { padding: 8px 12px; }
 
 .amounts { border: 0; padding: 0; margin: 0; min-width: 0; }
 .amount-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }

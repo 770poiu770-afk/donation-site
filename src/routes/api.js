@@ -8,7 +8,7 @@ const { sameOrigin } = require('../security');
 
 const router = express.Router();
 
-router.use(rateLimit({ windowMs: 60_000, limit: 40, standardHeaders: true, legacyHeaders: false }));
+router.use(rateLimit({ windowMs: 60_000, limit: 40, standardHeaders: true, legacyHeaders: false, skip: () => process.env.NODE_ENV === 'test' }));
 router.use(express.json({ limit: '10kb' }));
 router.use((req, res, next) => (req.method === 'POST' ? sameOrigin(req, res, next) : next()));
 router.use((req, res, next) => {
@@ -19,6 +19,10 @@ router.use((req, res, next) => {
 
 const PAYPAL_ID = /^[A-Z0-9-]{6,64}$/i;
 const lang = (l) => (l === 'he' ? 'he' : 'en');
+const pickCurrency = (c) => {
+  const cur = String(c || config.currency).toUpperCase();
+  return config.currencies.includes(cur) ? cur : null;
+};
 
 function fail(res, err) {
   console.error('[api]', err.message, err.debugId ? `debug_id=${err.debugId}` : '', err.body ? JSON.stringify(err.body).slice(0, 500) : '');
@@ -29,8 +33,10 @@ function fail(res, err) {
 router.post('/orders', async (req, res) => {
   const amount = parseAmount(req.body?.amount);
   if (!amount.ok) return res.status(400).json({ error: amount.error });
+  const currency = pickCurrency(req.body?.currency);
+  if (!currency) return res.status(400).json({ error: 'currency_invalid' });
   try {
-    const r = await donations.startOneTime({ amountCents: amount.cents, details: req.body?.details, lang: lang(req.body?.lang) });
+    const r = await donations.startOneTime({ amountCents: amount.cents, currency, details: req.body?.details, lang: lang(req.body?.lang) });
     res.status(201).json({ id: r.orderId });
   } catch (err) {
     fail(res, err);
@@ -60,8 +66,10 @@ router.post('/subscriptions', async (req, res) => {
   if (!config.paypal.enableSubscriptions) return res.status(400).json({ error: 'monthly_disabled' });
   const amount = parseAmount(req.body?.amount);
   if (!amount.ok) return res.status(400).json({ error: amount.error });
+  const currency = pickCurrency(req.body?.currency);
+  if (!currency) return res.status(400).json({ error: 'currency_invalid' });
   try {
-    const r = await donations.startMonthly({ amountCents: amount.cents, details: req.body?.details, lang: lang(req.body?.lang) });
+    const r = await donations.startMonthly({ amountCents: amount.cents, currency, details: req.body?.details, lang: lang(req.body?.lang) });
     res.status(201).json({ id: r.subscriptionId });
   } catch (err) {
     fail(res, err);

@@ -12,7 +12,16 @@ router.use(express.urlencoded({ extended: false, limit: '20kb' }));
 router.use((req, res, next) => {
   res.set('Cache-Control', 'no-store');
   res.set('X-Robots-Tag', 'noindex, nofollow');
-  res.locals.money = (c) => formatMoney(c || 0, config.currency, 'en-US');
+  res.locals.money = (c, cur) => formatMoney(c || 0, cur || res.locals.cur || config.currency, 'en-US');
+  // reports are per currency (never mix ₪ and $ in one total)
+  const cur = String(req.query.cur || '').toUpperCase();
+  if (config.currencies.includes(cur)) res.locals.cur = cur;
+  else {
+    // default: the currency most donations arrived in
+    const top = db.get().prepare(`SELECT currency FROM donations WHERE status IN ('completed','partially_refunded') GROUP BY currency ORDER BY COUNT(*) DESC LIMIT 1`).get();
+    res.locals.cur = top && config.currencies.includes(top.currency) ? top.currency : config.currencies.includes('ILS') ? 'ILS' : config.currencies[0];
+  }
+  res.locals.currencies = config.currencies;
   res.locals.fmtDate = (iso) => (iso ? new Intl.DateTimeFormat('he-IL', { timeZone: config.timezone, dateStyle: 'short', timeStyle: 'medium' }).format(new Date(iso)) : '—');
   res.locals.statusLabel = STATUS_LABELS;
   res.locals.path = req.path;
@@ -50,7 +59,7 @@ router.post('/logout', (req, res) => {
 
 /* ---------------- dashboard ---------------- */
 router.get('/', (req, res) => {
-  const s = reports.summary();
+  const s = reports.summary(res.locals.cur);
   const recent = db.get().prepare(`SELECT * FROM donations WHERE status NOT IN ('created','cancelled') ORDER BY created_at DESC LIMIT 8`).all();
   res.render('admin/dashboard', { s, recent, warnings: config.validate().warnings });
 });
@@ -137,7 +146,7 @@ router.get('/system', (req, res) => {
       webhookId: config.paypal.webhookId || null,
       webhookUrl: `${config.baseUrl}/webhooks/paypal`,
       baseUrl: config.baseUrl,
-      currency: config.currency,
+      currency: config.currencies.join(', '),
       monthly: config.paypal.enableSubscriptions,
       production: config.isProduction,
       timezone: config.timezone,

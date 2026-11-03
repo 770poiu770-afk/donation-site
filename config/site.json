@@ -2,14 +2,24 @@
   "_README": "All texts shown on the site. Replace every value marked [EDIT] with your organization's real details before going live.",
   "defaultLang": "he",
   "org": {
-    "name": { "en": "Your Organization", "he": "שם העמותה" },
+    "name": {
+      "en": "Your Organization",
+      "he": "שם העמותה"
+    },
     "legalName": "[EDIT] Registered name of the nonprofit",
     "registrationNumber": "[EDIT] 58-000000-0",
     "email": "donate@example.org",
     "phone": "+972-50-000-0000",
     "whatsapp": "972500000000",
-    "address": { "en": "[EDIT] Street, City, Israel", "he": "[EDIT] רחוב, עיר" },
-    "social": { "facebook": "", "instagram": "", "youtube": "" }
+    "address": {
+      "en": "[EDIT] Street, City, Israel",
+      "he": "[EDIT] רחוב, עיר"
+    },
+    "social": {
+      "facebook": "",
+      "instagram": "",
+      "youtube": ""
+    }
   },
   "content": {
     "en": {
@@ -19,33 +29,91 @@
       "missionTitle": "Our mission",
       "missionText": "We stand beside families facing hardship with immediate, practical help — and with the long-term support that lets them stand on their own. Every dollar is handled with care, transparency and respect for those we serve.",
       "programs": [
-        { "icon": "meal", "title": "Food for families", "text": "Weekly food baskets and hot meals for families who cannot make ends meet." },
-        { "icon": "book", "title": "Education & youth", "text": "Tutoring, school supplies and mentoring that open doors for children." },
-        { "icon": "home", "title": "Emergency assistance", "text": "Fast help with rent, utilities and medical costs when a crisis hits." },
-        { "icon": "gift", "title": "Holidays with dignity", "text": "Holiday packages so that every family can celebrate with joy." }
+        {
+          "icon": "meal",
+          "title": "Food for families",
+          "text": "Weekly food baskets and hot meals for families who cannot make ends meet."
+        },
+        {
+          "icon": "book",
+          "title": "Education & youth",
+          "text": "Tutoring, school supplies and mentoring that open doors for children."
+        },
+        {
+          "icon": "home",
+          "title": "Emergency assistance",
+          "text": "Fast help with rent, utilities and medical costs when a crisis hits."
+        },
+        {
+          "icon": "gift",
+          "title": "Holidays with dignity",
+          "text": "Holiday packages so that every family can celebrate with joy."
+        }
       ],
       "fundsTitle": "Where your money goes",
       "fundsText": "Your donation goes directly to our programs. We publish our annual reports and are glad to answer any question.",
       "funds": [
-        { "label": "Direct aid to families", "percent": null },
-        { "label": "Education & youth programs", "percent": null },
-        { "label": "Emergency fund", "percent": null },
-        { "label": "Operations & accountability", "percent": null }
+        {
+          "label": "Direct aid to families",
+          "percent": null
+        },
+        {
+          "label": "Education & youth programs",
+          "percent": null
+        },
+        {
+          "label": "Emergency fund",
+          "percent": null
+        },
+        {
+          "label": "Operations & accountability",
+          "percent": null
+        }
       ],
       "impactTitle": "What your gift can do",
       "impactExamples": [
-        { "amount": 18, "text": "A hot meal for a family" },
-        { "amount": 36, "text": "School supplies for a child" },
-        { "amount": 180, "text": "A full food basket for a week" },
-        { "amount": 1000, "text": "A month of support for a family in crisis" }
+        {
+          "amount": 18,
+          "text": "A hot meal for a family"
+        },
+        {
+          "amount": 36,
+          "text": "School supplies for a child"
+        },
+        {
+          "amount": 180,
+          "text": "A full food basket for a week"
+        },
+        {
+          "amount": 1000,
+          "text": "A month of support for a family in crisis"
+        }
       ],
       "faq": [
-        { "q": "Is donating on this site secure?", "a": "Yes. Payments are processed entirely by PayPal on its secure checkout. We never see or store your card details." },
-        { "q": "Do I need a PayPal account?", "a": "No. Choose “Debit or Credit Card” to pay with Visa, Mastercard and other cards without an account (where PayPal offers this in your country)." },
-        { "q": "Do I have to give my name or details?", "a": "No. You only choose an amount. Leaving your name, email or a message is completely optional, and we never publish donor names on the site." },
-        { "q": "Will I get a receipt?", "a": "PayPal emails you a payment confirmation immediately. For an official donation receipt, contact us with your transaction number." },
-        { "q": "How do I cancel a monthly donation?", "a": "You can cancel at any time from your PayPal account (Settings → Payments → Automatic payments), or contact us and we will help." },
-        { "q": "Which currency is charged?", "a": "Donations are in US dollars. If your card is in another currency, your bank or PayPal converts it." }
+        {
+          "q": "Is donating on this site secure?",
+          "a": "Yes. Payments are processed entirely by PayPal on its secure checkout. We never see or store your card details."
+        },
+        {
+          "q": "Do I need a PayPal account?",
+          "a": "No. Choose “Debit or Credit Card” to pay with Visa, Mastercard and other cards without an account (where PayPal offers this in your country)."
+        },
+        {
+          "q": "Do I have to give my name or details?",
+          "a": "No. You only choose an amount. Leaving your name, email or a message is completely optional, and we never publish donor names on the site."
+        },
+        {
+          "q": "Will I get a receipt?",
+          "a": "PayPal emails you a payment confirmation immediately. For an official donation receipt, contact us with your transaction number."
+        },
+        {
+          "q": "How do I cancel a monthly donation?",
+          "a": "You can cancel at any time from your PayPal account (Settings → Payments → Automatic payments), or contact us and we will help."
+        },
+        {
+          "q": "Which currency is charged?",
+          "a": "You can donate in Israeli shekels (₪) or US dollars ($) — choose the currency at the top of the donation form."
+        }
       ]
     },
     "he": {
@@ -55,33 +123,91 @@
       "missionTitle": "המטרה שלנו",
       "missionText": "אנחנו עומדים לצד משפחות שמתמודדות עם קושי — עם עזרה מיידית ומעשית, ועם ליווי לטווח ארוך שמאפשר להן לעמוד על הרגליים. כל שקל מטופל באחריות, בשקיפות ובכבוד למי שאנחנו משרתים.",
       "programs": [
-        { "icon": "meal", "title": "מזון למשפחות", "text": "סלי מזון שבועיים וארוחות חמות למשפחות שמתקשות לגמור את החודש." },
-        { "icon": "book", "title": "חינוך ונוער", "text": "שיעורי עזר, ציוד לימודי וחונכות שפותחים דלתות לילדים." },
-        { "icon": "home", "title": "סיוע חירום", "text": "עזרה מהירה בשכר דירה, חשבונות והוצאות רפואיות ברגע משבר." },
-        { "icon": "gift", "title": "חגים בכבוד", "text": "חבילות לחג כדי שכל משפחה תוכל לחגוג בשמחה." }
+        {
+          "icon": "meal",
+          "title": "מזון למשפחות",
+          "text": "סלי מזון שבועיים וארוחות חמות למשפחות שמתקשות לגמור את החודש."
+        },
+        {
+          "icon": "book",
+          "title": "חינוך ונוער",
+          "text": "שיעורי עזר, ציוד לימודי וחונכות שפותחים דלתות לילדים."
+        },
+        {
+          "icon": "home",
+          "title": "סיוע חירום",
+          "text": "עזרה מהירה בשכר דירה, חשבונות והוצאות רפואיות ברגע משבר."
+        },
+        {
+          "icon": "gift",
+          "title": "חגים בכבוד",
+          "text": "חבילות לחג כדי שכל משפחה תוכל לחגוג בשמחה."
+        }
       ],
       "fundsTitle": "לאן הולך הכסף",
       "fundsText": "התרומה שלך מגיעה ישירות לתוכניות שלנו. אנחנו מפרסמים דוחות שנתיים ושמחים לענות על כל שאלה.",
       "funds": [
-        { "label": "סיוע ישיר למשפחות", "percent": null },
-        { "label": "תוכניות חינוך ונוער", "percent": null },
-        { "label": "קרן חירום", "percent": null },
-        { "label": "תפעול ובקרה", "percent": null }
+        {
+          "label": "סיוע ישיר למשפחות",
+          "percent": null
+        },
+        {
+          "label": "תוכניות חינוך ונוער",
+          "percent": null
+        },
+        {
+          "label": "קרן חירום",
+          "percent": null
+        },
+        {
+          "label": "תפעול ובקרה",
+          "percent": null
+        }
       ],
       "impactTitle": "מה התרומה שלך יכולה לעשות",
       "impactExamples": [
-        { "amount": 18, "text": "ארוחה חמה למשפחה" },
-        { "amount": 36, "text": "ציוד לימודי לילד" },
-        { "amount": 180, "text": "סל מזון מלא לשבוע" },
-        { "amount": 1000, "text": "חודש של ליווי למשפחה במשבר" }
+        {
+          "amount": 18,
+          "text": "ארוחה חמה למשפחה"
+        },
+        {
+          "amount": 36,
+          "text": "ציוד לימודי לילד"
+        },
+        {
+          "amount": 180,
+          "text": "סל מזון מלא לשבוע"
+        },
+        {
+          "amount": 1000,
+          "text": "חודש של ליווי למשפחה במשבר"
+        }
       ],
       "faq": [
-        { "q": "האם התרומה באתר מאובטחת?", "a": "כן. התשלום מתבצע כולו אצל PayPal, בדף התשלום המאובטח שלה. אנחנו לא רואים ולא שומרים את פרטי הכרטיס שלך." },
-        { "q": "האם צריך חשבון PayPal?", "a": "לא. בוחרים “כרטיס חיוב או אשראי” ומשלמים ב-Visa, Mastercard וכרטיסים נוספים בלי חשבון (בכפוף לזמינות השירות של PayPal במדינה שלך)." },
-        { "q": "חייבים למסור שם או פרטים?", "a": "לא. בוחרים רק סכום. השארת שם, אימייל או הודעה היא רשות בלבד, ואנחנו אף פעם לא מפרסמים שמות תורמים באתר." },
-        { "q": "האם אקבל קבלה?", "a": "PayPal שולחת לך אישור תשלום במייל מיד. לקבלה רשמית על תרומה, פנו אלינו עם מספר העסקה." },
-        { "q": "איך מבטלים תרומה חודשית?", "a": "אפשר לבטל בכל רגע בחשבון ה-PayPal (הגדרות ← תשלומים ← תשלומים אוטומטיים), או לפנות אלינו ונעזור." },
-        { "q": "באיזה מטבע מתבצע החיוב?", "a": "התרומות בדולר אמריקאי. אם הכרטיס שלך במטבע אחר, הבנק או PayPal ימירו אותו." }
+        {
+          "q": "האם התרומה באתר מאובטחת?",
+          "a": "כן. התשלום מתבצע כולו אצל PayPal, בדף התשלום המאובטח שלה. אנחנו לא רואים ולא שומרים את פרטי הכרטיס שלך."
+        },
+        {
+          "q": "האם צריך חשבון PayPal?",
+          "a": "לא. בוחרים “כרטיס חיוב או אשראי” ומשלמים ב-Visa, Mastercard וכרטיסים נוספים בלי חשבון (בכפוף לזמינות השירות של PayPal במדינה שלך)."
+        },
+        {
+          "q": "חייבים למסור שם או פרטים?",
+          "a": "לא. בוחרים רק סכום. השארת שם, אימייל או הודעה היא רשות בלבד, ואנחנו אף פעם לא מפרסמים שמות תורמים באתר."
+        },
+        {
+          "q": "האם אקבל קבלה?",
+          "a": "PayPal שולחת לך אישור תשלום במייל מיד. לקבלה רשמית על תרומה, פנו אלינו עם מספר העסקה."
+        },
+        {
+          "q": "איך מבטלים תרומה חודשית?",
+          "a": "אפשר לבטל בכל רגע בחשבון ה-PayPal (הגדרות ← תשלומים ← תשלומים אוטומטיים), או לפנות אלינו ונעזור."
+        },
+        {
+          "q": "באיזה מטבע מתבצע החיוב?",
+          "a": "אפשר לתרום בשקלים (₪) או בדולרים ($). בוחרים את המטבע בראש טופס התרומה."
+        }
       ]
     }
   },

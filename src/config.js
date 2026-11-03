@@ -24,7 +24,9 @@ const config = {
   baseUrl: (env.BASE_URL || env.RENDER_EXTERNAL_URL || `http://localhost:${env.PORT || 3000}`).replace(/\/+$/, ''),
   trustProxy: env.TRUST_PROXY ? (isNaN(Number(env.TRUST_PROXY)) ? env.TRUST_PROXY : Number(env.TRUST_PROXY)) : (isProduction ? 1 : false),
   timezone: env.TIMEZONE || 'Asia/Jerusalem',
-  currency: (env.CURRENCY || 'USD').toUpperCase(),
+  currency: (env.CURRENCY || 'USD').toUpperCase(), // default / primary currency
+  // Currencies donors can choose from (PayPal supports both USD and ILS)
+  currencies: (env.CURRENCIES || 'USD,ILS').split(',').map((c) => c.trim().toUpperCase()).filter(Boolean),
   databasePath: env.DATABASE_PATH || path.join(__dirname, '..', 'data', 'donations.db'),
 
   paypal: {
@@ -50,6 +52,11 @@ const config = {
     minCents: 100, // $1.00
     maxCents: 100000000, // $1,000,000.00
     presets: [5, 18, 36, 72, 100, 180, 360, 500, 1000, 5000, 10000, 50000, 100000],
+    presetsByCurrency: {
+      USD: [5, 18, 36, 72, 100, 180, 360, 500, 1000, 5000, 10000, 50000, 100000],
+      ILS: [18, 36, 52, 72, 100, 180, 360, 500, 1000, 1800, 5000, 10000, 100000],
+    },
+    defaultPreset: { USD: 36, ILS: 100 },
   },
 };
 

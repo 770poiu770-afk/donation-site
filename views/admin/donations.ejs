@@ -16,16 +16,26 @@
       <option value="monthly" <%= q.type === 'monthly' ? 'selected' : '' %>>חודשית</option>
     </select>
   </label>
+  <% if (currencies.length > 1) { %>
+  <label>מטבע
+    <select name="currency">
+      <option value="">הכול</option>
+      <% currencies.forEach(c => { %><option value="<%= c %>" <%= q.currency === c ? 'selected' : '' %>><%= c === 'ILS' ? '₪ שקל' : c === 'USD' ? '$ דולר' : c %></option><% }) %>
+    </select>
+  </label>
+  <% } %>
   <label>מתאריך<input type="date" name="from" value="<%= q.from || '' %>"></label>
   <label>עד תאריך<input type="date" name="to" value="<%= q.to || '' %>"></label>
-  <label>סכום מינימלי ($)<input type="number" name="min" min="0" step="1" value="<%= q.min || '' %>"></label>
+  <label>סכום מינימלי<input type="number" name="min" min="0" step="1" value="<%= q.min || '' %>"></label>
   <div class="filter-actions">
     <button class="btn" type="submit">סינון</button>
     <a class="btn btn-ghost" href="/admin/donations">ניקוי</a>
     <a class="btn btn-ghost" href="/admin/donations.csv<%= qs ? '?' + qs : '' %>">ייצוא ל-Excel (CSV)</a>
   </div>
 </form>
-<p class="result-line"><strong><%= result.count %></strong> רשומות · סכום ששולם בפועל: <strong><%= money(result.sum) %></strong></p>
+<p class="result-line"><strong><%= result.count %></strong> רשומות · סכום ששולם בפועל:
+  <% if (!result.sums.length) { %><strong>0</strong><% } %>
+  <% result.sums.forEach((s, i) => { %><%= i ? ' + ' : '' %><strong dir="ltr"><%= money(s.t, s.currency) %></strong><% }) %></p>
 <section class="card flush">
   <%- include('_rows', { rows: result.rows }) %>
 </section>

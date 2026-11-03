@@ -1,7 +1,7 @@
 <%- include('_top', { title: 'תרומה ' + d.id }) %>
 <p class="crumbs"><a href="/admin/donations">→ חזרה לתרומות</a></p>
 <div class="detail-head">
-  <h1 dir="ltr"><%= money(d.amount_cents) %></h1>
+  <h1 dir="ltr"><%= money(d.amount_cents, d.currency) %></h1>
   <span class="badge b-<%= d.status %>"><%= statusLabel[d.status] || d.status %></span>
   <span class="pill"><%= d.type === 'monthly' ? 'תרומה חודשית' : 'תרומה חד-פעמית' %></span>
 </div>
@@ -13,10 +13,10 @@
       <dt>אסמכתא באתר</dt><dd dir="ltr" class="mono"><%= d.public_id %></dd>
       <dt>נוצרה</dt><dd><%= fmtDate(d.created_at) %></dd>
       <dt>שולמה</dt><dd><%= fmtDate(d.completed_at) %></dd>
-      <dt>סכום</dt><dd dir="ltr"><%= money(d.amount_cents) %> <%= d.currency %></dd>
-      <dt>עמלת PayPal</dt><dd dir="ltr"><%= d.fee_cents != null ? money(d.fee_cents) : '—' %></dd>
-      <dt>נטו</dt><dd dir="ltr"><%= d.net_cents != null ? money(d.net_cents) : '—' %></dd>
-      <dt>הוחזר</dt><dd dir="ltr"><%= money(d.refunded_cents) %></dd>
+      <dt>סכום</dt><dd dir="ltr"><%= money(d.amount_cents, d.currency) %> (<%= d.currency %>)</dd>
+      <dt>עמלת PayPal</dt><dd dir="ltr"><%= d.fee_cents != null ? money(d.fee_cents, d.currency) : '—' %></dd>
+      <dt>נטו</dt><dd dir="ltr"><%= d.net_cents != null ? money(d.net_cents, d.currency) : '—' %></dd>
+      <dt>הוחזר</dt><dd dir="ltr"><%= money(d.refunded_cents, d.currency) %></dd>
       <dt>מספר הזמנה (Order)</dt><dd dir="ltr" class="mono"><%= d.paypal_order_id || '—' %></dd>
       <dt>מספר עסקה (Transaction)</dt><dd dir="ltr" class="mono"><%= d.paypal_capture_id || '—' %>
         <% if (d.paypal_capture_id && mode !== 'mock') { %><a class="ext" target="_blank" rel="noopener" href="<%= paypalHost %>/activity/payment/<%= d.paypal_capture_id %>">פתיחה ב-PayPal ↗</a><% } %></dd>
@@ -42,7 +42,7 @@
 <section class="card">
   <h2>החזרים</h2>
   <table class="tbl"><thead><tr><th>מספר החזר</th><th>סכום</th><th>תאריך</th></tr></thead><tbody>
-  <% refunds.forEach(r => { %><tr><td dir="ltr" class="mono ta-r"><%= r.refund_id %></td><td dir="ltr"><%= money(r.amount_cents) %></td><td><%= fmtDate(r.created_at) %></td></tr><% }) %>
+  <% refunds.forEach(r => { %><tr><td dir="ltr" class="mono ta-r"><%= r.refund_id %></td><td dir="ltr"><%= money(r.amount_cents, d.currency) %></td><td><%= fmtDate(r.created_at) %></td></tr><% }) %>
   </tbody></table>
 </section>
 <% } %>

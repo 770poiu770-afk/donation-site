@@ -103,9 +103,9 @@ const captureOrder = (orderId, publicId) =>
   request('POST', `/v2/checkout/orders/${encodeURIComponent(orderId)}/capture`, { requestId: `${publicId}-capture`, body: {} });
 
 /* ---------------- Catalog / Plans / Subscriptions ---------------- */
-const createProduct = () =>
+const createProduct = (currency = config.currency) =>
   request('POST', '/v1/catalogs/products', {
-    requestId: `product-${config.paypal.mode}-${config.currency}`,
+    requestId: `product-${config.paypal.mode}-${currency}`,
     body: {
       name: `${brandName()} – Monthly donation`.slice(0, 127),
       description: 'Recurring monthly donation',

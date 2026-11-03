@@ -103,8 +103,8 @@ function applyCapture(donation, capture, extra = {}) {
 /* one-time donations (Orders API v2)                                  */
 /* ------------------------------------------------------------------ */
 
-async function startOneTime({ amountCents, details, lang }) {
-  const donation = db.createDonation({ type: 'one_time', amountCents, lang, ...cleanOptional(details) });
+async function startOneTime({ amountCents, currency = config.currency, details, lang }) {
+  const donation = db.createDonation({ type: 'one_time', amountCents, currency, lang, ...cleanOptional(details) });
   db.audit({ donationId: donation.id, event: 'order:create:request', details: { amountCents } });
   try {
     const order = await paypal.createOrder({
@@ -183,16 +183,15 @@ function cancelOneTime(orderId) {
 /* monthly donations (Subscriptions API)                               */
 /* ------------------------------------------------------------------ */
 
-async function ensurePlan(amountCents) {
+async function ensurePlan(amountCents, currency = config.currency) {
   const { mode } = config.paypal;
-  const currency = config.currency;
   const existing = db.getPlan(amountCents, currency, mode);
   if (existing) return existing;
 
   const productKey = `paypal_product_${mode}_${currency}`;
   let productId = db.getSetting(productKey);
   if (!productId) {
-    const product = await paypal.createProduct();
+    const product = await paypal.createProduct(currency);
     productId = product.id;
     db.setSetting(productKey, productId);
   }
@@ -201,16 +200,16 @@ async function ensurePlan(amountCents) {
   return plan.id;
 }
 
-async function startMonthly({ amountCents, details, lang }) {
+async function startMonthly({ amountCents, currency = config.currency, details, lang }) {
   if (!config.paypal.enableSubscriptions) {
     const e = new Error('Monthly donations are disabled');
     e.status = 400;
     throw e;
   }
-  const sub = db.createSubscription({ amountCents, lang, ...cleanOptional(details) });
+  const sub = db.createSubscription({ amountCents, currency, lang, ...cleanOptional(details) });
   db.audit({ subscriptionId: sub.id, event: 'subscription:create:request', details: { amountCents } });
   try {
-    const planId = await ensurePlan(amountCents);
+    const planId = await ensurePlan(amountCents, currency);
     const ppSub = await paypal.createSubscription({
       planId,
       publicId: sub.public_id,

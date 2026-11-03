@@ -1,4 +1,4 @@
-/* Donation widget: amount selection + PayPal Smart Buttons (PayPal & guest card).
+/* Donation widget: currency (₪ / $), amount selection + PayPal Smart Buttons (PayPal & guest card).
    The server creates and captures every order; this file never decides success. */
 (function () {
   'use strict';
@@ -12,24 +12,30 @@
   const $ = (s) => form.querySelector(s);
   const $$ = (s) => Array.from(form.querySelectorAll(s));
 
+  const SYMBOL = { USD: '$', ILS: '₪', EUR: '€', GBP: '£' };
   const customInput = $('input[name="custom"]');
   const customWrap = customInput.closest('.custom-amount');
   const summary = $('[data-summary]');
   const per = $('[data-per]');
   const suffix = $('[data-suffix]');
+  const symbolEl = $('[data-symbol]');
+  const grid = $('[data-amount-grid]');
   const monthlyNote = $('[data-monthly-note]');
   const msg = $('[data-msg]');
   const processing = $('[data-processing]');
   const payArea = $('.pay-area');
+  const holder = $('[data-pp-holder]');
   const loading = $('[data-pp-loading]');
-  const freqBox = $('.freq');
+  const freqBox = $('.freq-type');
+  const curBox = $('.cur-toggle');
 
   const MIN = 100, MAX = 100000000;
   let freq = 'one_time';
+  let currency = cfg.currency;
 
   /* ---------------- amount ---------------- */
   function parseCents(str) {
-    const s = String(str || '').replace(/[,\s$]/g, '');
+    const s = String(str || '').replace(/[,\s$₪]/g, '');
     if (!/^\d{1,7}(\.\d{1,2})?$/.test(s)) return null;
     const [w, f = ''] = s.split('.');
     return parseInt(w, 10) * 100 + parseInt((f + '00').slice(0, 2), 10);
@@ -40,8 +46,9 @@
     return p ? parseInt(p.value, 10) * 100 : null;
   }
   function valid(c) { return c !== null && c >= MIN && c <= MAX; }
+  function sym() { return SYMBOL[currency] || ''; }
   function fmt(c) {
-    return '$' + (c / 100).toLocaleString('en-US', { minimumFractionDigits: c % 100 ? 2 : 0, maximumFractionDigits: 2 });
+    return sym() + (c / 100).toLocaleString('en-US', { minimumFractionDigits: c % 100 ? 2 : 0, maximumFractionDigits: 2 });
   }
   function refresh(bump) {
     const c = currentCents();
@@ -53,7 +60,36 @@
     if (ok) hideMsg();
   }
 
-  $$('input[name="preset"]').forEach((r) => r.addEventListener('change', () => { customInput.value = ''; refresh(true); }));
+  function bindPresets() {
+    $$('input[name="preset"]').forEach((r) => r.addEventListener('change', () => { customInput.value = ''; refresh(true); }));
+  }
+  function defaultPreset() {
+    return (cfg.defaultPreset && cfg.defaultPreset[currency]) || 36;
+  }
+  /** Rebuild the preset buttons for the selected currency */
+  function renderPresets() {
+    const list = (cfg.presetsByCurrency && cfg.presetsByCurrency[currency]) || cfg.presets;
+    const def = defaultPreset();
+    grid.innerHTML = '';
+    list.forEach((p) => {
+      const label = document.createElement('label');
+      label.className = 'amount-opt';
+      const input = document.createElement('input');
+      input.type = 'radio';
+      input.name = 'preset';
+      input.value = String(p);
+      input.checked = !customInput.value.trim() && p === def;
+      const span = document.createElement('span');
+      span.dir = 'ltr';
+      span.textContent = sym() + p.toLocaleString('en-US');
+      label.append(input, span);
+      grid.appendChild(label);
+    });
+    symbolEl.textContent = sym();
+    bindPresets();
+  }
+
+  bindPresets();
   customInput.addEventListener('input', () => {
     customInput.value = customInput.value.replace(/[^\d.,]/g, '');
     if (customInput.value.trim()) $$('input[name="preset"]').forEach((r) => (r.checked = false));
@@ -61,7 +97,7 @@
   });
   customInput.addEventListener('blur', () => {
     if (!customInput.value.trim() && !form.querySelector('input[name="preset"]:checked')) {
-      const def = form.querySelector('input[name="preset"][value="36"]');
+      const def = form.querySelector(`input[name="preset"][value="${defaultPreset()}"]`);
       if (def) def.checked = true;
       refresh(false);
     }
@@ -71,27 +107,45 @@
   document.querySelectorAll('[data-pick-amount]').forEach((btn) =>
     btn.addEventListener('click', () => setAmount(parseInt(btn.dataset.pickAmount, 10)))
   );
-  function setAmount(dollars) {
-    const r = form.querySelector(`input[name="preset"][value="${dollars}"]`);
-    if (r) { r.checked = true; customInput.value = ''; } else { customInput.value = String(dollars); }
+  function setAmount(n) {
+    const r = form.querySelector(`input[name="preset"][value="${n}"]`);
+    if (r) { r.checked = true; customInput.value = ''; } else { customInput.value = String(n); $$('input[name="preset"]').forEach((x) => (x.checked = false)); }
     refresh(true);
     form.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
-  /* ---------------- frequency ---------------- */
+  /* ---------------- frequency & currency ---------------- */
+  function moveGlider(box) {
+    if (!box) return;
+    const opts = Array.from(box.querySelectorAll('input'));
+    const i = Math.max(0, opts.findIndex((o) => o.checked));
+    box.style.setProperty('--n', opts.length);
+    box.style.setProperty('--i', i);
+  }
   $$('input[name="freq"]').forEach((r) =>
     r.addEventListener('change', () => {
       freq = r.value;
       const monthly = freq === 'monthly';
-      freqBox && freqBox.classList.toggle('is-monthly', monthly);
+      moveGlider(freqBox);
       per.hidden = !monthly;
       suffix.hidden = !monthly;
       monthlyNote.hidden = !monthly;
-      $$('[data-pp]').forEach((el) => (el.hidden = el.dataset.pp !== freq));
       hideMsg();
-      renderButtons(freq);
+      showButtons();
     })
   );
+  $$('input[name="currency"]').forEach((r) =>
+    r.addEventListener('change', () => {
+      currency = r.value;
+      moveGlider(curBox);
+      renderPresets();
+      refresh(true);
+      hideMsg();
+      showButtons();
+    })
+  );
+  moveGlider(freqBox);
+  moveGlider(curBox);
 
   /* ---------------- messages ---------------- */
   function showMsg(text, info) { msg.textContent = text; msg.classList.toggle('info', !!info); msg.hidden = false; }
@@ -110,20 +164,23 @@
     return { ok: res.ok, status: res.status, data };
   }
 
-  /* ---------------- PayPal SDK ---------------- */
+  /* ---------------- PayPal SDK ----------------
+     The SDK's currency is fixed per script load, so each (type, currency)
+     pair gets its own namespaced SDK instance and button container. */
   const sdkPromises = {};
-  function loadSdk(kind) {
-    if (sdkPromises[kind]) return sdkPromises[kind];
+  function loadSdk(kind, cur) {
+    const key = `${kind}_${cur}`;
+    if (sdkPromises[key]) return sdkPromises[key];
     const params = new URLSearchParams({
       'client-id': cfg.clientId,
-      currency: cfg.currency,
+      currency: cur,
       components: 'buttons',
       locale: cfg.locale,
     });
     if (kind === 'monthly') { params.set('vault', 'true'); params.set('intent', 'subscription'); }
     else { params.set('intent', 'capture'); params.set('enable-funding', 'card'); params.set('disable-funding', 'paylater,credit'); }
-    const ns = kind === 'monthly' ? 'paypal_monthly' : 'paypal_once';
-    sdkPromises[kind] = new Promise((resolve, reject) => {
+    const ns = `paypal_${kind}_${cur}`;
+    sdkPromises[key] = new Promise((resolve, reject) => {
       const s = document.createElement('script');
       s.src = cfg.sdkBase + '?' + params.toString();
       s.dataset.namespace = ns;
@@ -131,20 +188,41 @@
       if (cfg.nonce) { s.nonce = cfg.nonce; s.setAttribute('data-csp-nonce', cfg.nonce); }
       s.async = true;
       s.onload = () => (window[ns] ? resolve(window[ns]) : reject(new Error('sdk')));
-      s.onerror = () => { delete sdkPromises[kind]; reject(new Error('sdk')); };
+      s.onerror = () => { delete sdkPromises[key]; reject(new Error('sdk')); };
       document.head.appendChild(s);
     });
-    return sdkPromises[kind];
+    return sdkPromises[key];
   }
 
   const rendered = {};
-  async function renderButtons(kind) {
-    if (rendered[kind]) return;
+  function containerFor(key) {
+    let el = holder.querySelector(`[data-pp="${key}"]`);
+    if (!el) {
+      el = document.createElement('div');
+      el.className = 'pp-buttons';
+      el.dataset.pp = key;
+      holder.appendChild(el);
+    }
+    return el;
+  }
+
+  function showButtons() {
+    const key = `${freq}_${currency}`;
+    holder.querySelectorAll('[data-pp]').forEach((el) => (el.hidden = el.dataset.pp !== key));
+    containerFor(key).hidden = false;
+    if (rendered[key]) { payArea.classList.add('ready'); return; }
+    renderButtons(freq, currency);
+  }
+
+  async function renderButtons(kind, cur) {
+    const key = `${kind}_${cur}`;
     if (!cfg.available) { loading.hidden = true; showMsg(T.errUnavailable, true); return; }
     payArea.classList.remove('ready');
+    loading.hidden = false;
     let pp;
-    try { pp = await loadSdk(kind); } catch (e) { loading.hidden = true; showMsg(T.errUnavailable); return; }
-    const container = form.querySelector(`[data-pp="${kind}"]`);
+    try { pp = await loadSdk(kind, cur); } catch (e) { loading.hidden = true; showMsg(T.errUnavailable); return; }
+    const container = containerFor(key);
+    const amountBody = () => ({ amount: (currentCents() / 100).toFixed(2), currency: cur, details: details(), lang: cfg.lang });
 
     const common = {
       style: { layout: 'vertical', color: 'gold', shape: 'pill', label: kind === 'monthly' ? 'subscribe' : 'donate', height: 50, tagline: false },
@@ -166,8 +244,8 @@
       ? {
           ...common,
           createSubscription: async () => {
-            const r = await post('/api/subscriptions', { amount: (currentCents() / 100).toFixed(2), details: details(), lang: cfg.lang });
-            if (!r.ok) throw new Error(r.data.error || 'create');
+            const r = await post('/api/subscriptions', amountBody());
+            if (!r.ok) { if (ERR[r.data.error]) showMsg(ERR[r.data.error]); throw new Error(r.data.error || 'create'); }
             return r.data.id;
           },
           onApprove: async (data) => {
@@ -181,11 +259,8 @@
       : {
           ...common,
           createOrder: async () => {
-            const r = await post('/api/orders', { amount: (currentCents() / 100).toFixed(2), details: details(), lang: cfg.lang });
-            if (!r.ok) {
-              if (ERR[r.data.error]) showMsg(ERR[r.data.error]);
-              throw new Error(r.data.error || 'create');
-            }
+            const r = await post('/api/orders', amountBody());
+            if (!r.ok) { if (ERR[r.data.error]) showMsg(ERR[r.data.error]); throw new Error(r.data.error || 'create'); }
             return r.data.id;
           },
           onApprove: async (data, actions) => {
@@ -199,10 +274,9 @@
         };
 
     try {
-      const buttons = pp.Buttons(opts);
-      await buttons.render(container);
-      rendered[kind] = true;
-      payArea.classList.add('ready');
+      await pp.Buttons(opts).render(container);
+      rendered[key] = true;
+      if (`${freq}_${currency}` === key) payArea.classList.add('ready');
     } catch (e) {
       loading.hidden = true;
       showMsg(T.errUnavailable);
@@ -210,6 +284,5 @@
   }
 
   refresh(false);
-  // Load PayPal as soon as the widget is near the viewport (it is above the fold on the home page)
-  renderButtons('one_time');
+  showButtons();
 })();

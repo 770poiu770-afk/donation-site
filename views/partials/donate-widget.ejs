@@ -1,6 +1,9 @@
 <%
   const dc = donateConfig;
-  const fmtPreset = (n) => '$' + n.toLocaleString('en-US');
+  const sym = currencySymbol[dc.currency] || '';
+  const presets = (dc.presetsByCurrency && dc.presetsByCurrency[dc.currency]) || dc.presets;
+  const defPreset = (dc.defaultPreset && dc.defaultPreset[dc.currency]) || presets[2];
+  const fmtPreset = (n) => sym + n.toLocaleString('en-US');
 %>
 <form class="donate-card" data-donate novalidate
       data-config='<%- JSON.stringify(dc).replace(/</g, "\\u003c").replace(/'/g, "\\u0027") %>'
@@ -8,28 +11,38 @@
       data-errors='<%- JSON.stringify(t("errors")).replace(/</g, "\\u003c").replace(/'/g, "\\u0027") %>'>
   <div class="donate-head">
     <h2 class="donate-title"><%= t('donate.button') %></h2>
+    <div class="toggles">
+    <% if (dc.currencies.length > 1) { %>
+    <div class="freq cur-toggle" role="radiogroup" aria-label="<%= t('donate.currency') %>">
+      <% dc.currencies.forEach((cc) => { %>
+      <label class="freq-opt"><input type="radio" name="currency" value="<%= cc %>" <%= cc === dc.currency ? 'checked' : '' %>><span><%= currencySymbol[cc] || cc %> <%= cc %></span></label>
+      <% }) %>
+      <span class="freq-glider" aria-hidden="true"></span>
+    </div>
+    <% } %>
     <% if (dc.monthlyEnabled) { %>
-    <div class="freq" role="radiogroup" aria-label="<%= t('donate.title') %>">
+    <div class="freq freq-type" role="radiogroup" aria-label="<%= t('donate.title') %>">
       <label class="freq-opt"><input type="radio" name="freq" value="one_time" checked><span><%= t('donate.oneTime') %></span></label>
       <label class="freq-opt"><input type="radio" name="freq" value="monthly"><span><%= t('donate.monthly') %></span></label>
       <span class="freq-glider" aria-hidden="true"></span>
     </div>
     <% } %>
+    </div>
   </div>
 
   <fieldset class="amounts">
     <legend class="sr-only"><%= t('donate.chooseAmount') %></legend>
-    <div class="amount-grid">
-      <% dc.presets.forEach((p, i) => { %>
+    <div class="amount-grid" data-amount-grid>
+      <% presets.forEach((p, i) => { %>
       <label class="amount-opt">
-        <input type="radio" name="preset" value="<%= p %>" <%= p === 36 ? 'checked' : '' %>>
+        <input type="radio" name="preset" value="<%= p %>" <%= p === defPreset ? 'checked' : '' %>>
         <span dir="ltr"><%= fmtPreset(p) %></span>
       </label>
       <% }) %>
     </div>
     <label class="custom-amount">
       <span class="sr-only"><%= t('donate.otherAmount') %></span>
-      <span class="currency" aria-hidden="true">$</span>
+      <span class="currency" aria-hidden="true" data-symbol><%= sym %></span>
       <input type="text" name="custom" inputmode="decimal" autocomplete="off" maxlength="12" dir="ltr"
              placeholder="<%= t('donate.otherPlaceholder') %>" aria-describedby="donate-error">
       <span class="custom-suffix" data-suffix hidden><%= t('donate.perMonth') %></span>
@@ -38,7 +51,7 @@
 
   <p class="donate-summary" aria-live="polite">
     <span><%= t('donate.youGive') %></span>
-    <strong dir="ltr" data-summary>$36</strong><span class="per" data-per hidden><%= t('donate.perMonth') %></span>
+    <strong dir="ltr" data-summary><%= fmtPreset(defPreset) %></strong><span class="per" data-per hidden><%= t('donate.perMonth') %></span>
   </p>
   <p class="monthly-note" data-monthly-note hidden><%= t('donate.monthlyNote') %></p>
 
@@ -53,8 +66,7 @@
   </details>
 
   <div class="pay-area">
-    <div class="pp-buttons" data-pp="one_time" aria-label="<%= t('donate.chooseMethod') %>"></div>
-    <div class="pp-buttons" data-pp="monthly" hidden aria-label="<%= t('donate.chooseMethod') %>"></div>
+    <div data-pp-holder aria-label="<%= t('donate.chooseMethod') %>"></div>
     <div class="pp-loading" data-pp-loading><span class="spinner" aria-hidden="true"></span><%= t('donate.loadingPayPal') %></div>
   </div>
 

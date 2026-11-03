@@ -14,10 +14,10 @@
       <tr>
         <td><%= fmtDate(r.created_at) %></td>
         <td><%= r.payer_name || r.donor_name || 'אנונימי' %><% if (r.payer_email || r.donor_email) { %><div class="sub" dir="ltr"><%= r.payer_email || r.donor_email %></div><% } %></td>
-        <td dir="ltr"><strong><%= money(r.amount_cents) %></strong></td>
+        <td dir="ltr"><strong><%= money(r.amount_cents, r.currency) %></strong></td>
         <td><span class="badge b-<%= r.status %>"><%= statusLabel[r.status] || r.status %></span></td>
         <td><%= r.payments %></td>
-        <td dir="ltr"><%= money(r.collected) %></td>
+        <td dir="ltr"><%= money(r.collected, r.currency) %></td>
         <td dir="ltr" class="mono ta-r"><%= r.paypal_subscription_id || '—' %></td>
       </tr>
       <% }) %>

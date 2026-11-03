@@ -9,21 +9,33 @@ const router = express.Router();
 
 function publicStats() {
   const d = db.get();
-  const r = d
-    .prepare(`SELECT COUNT(*) AS n, COALESCE(SUM(amount_cents - refunded_cents),0) AS total
-              FROM donations WHERE status IN ('completed','partially_refunded')`)
-    .get();
+  const rows = d
+    .prepare(`SELECT currency, COUNT(*) AS n, COALESCE(SUM(amount_cents - refunded_cents),0) AS total
+              FROM donations WHERE status IN ('completed','partially_refunded') GROUP BY currency`)
+    .all();
+  const count = rows.reduce((a, r) => a + r.n, 0);
+  const totals = rows.filter((r) => r.total > 0).map((r) => ({ currency: r.currency, cents: r.total }));
   const subs = d.prepare(`SELECT COUNT(*) AS n FROM subscriptions WHERE status = 'active'`).get().n;
   const min = config.site.statsMinDonations ?? 10;
-  return { show: r.n >= min, count: r.n, totalCents: r.total, monthly: subs };
+  return { show: count >= min, count, totals, monthly: subs };
+}
+
+const SYMBOL = { USD: '$', ILS: '₪', EUR: '€', GBP: '£' };
+
+function defaultCurrency(lang) {
+  if (lang === 'he' && config.currencies.includes('ILS')) return 'ILS';
+  return config.currencies.includes(config.currency) ? config.currency : config.currencies[0];
 }
 
 function donateConfig(lang) {
   return {
     clientId: config.paypal.clientId,
-    currency: config.currency,
+    currency: defaultCurrency(lang),
+    currencies: config.currencies,
     sdkBase: config.paypal.sdkBase,
     presets: config.donation.presets,
+    presetsByCurrency: config.donation.presetsByCurrency,
+    defaultPreset: config.donation.defaultPreset,
     monthlyEnabled: config.paypal.enableSubscriptions,
     available: config.paypalConfigured(),
     locale: lang === 'he' ? 'he_IL' : 'en_US',
@@ -33,7 +45,8 @@ function donateConfig(lang) {
 
 router.use((req, res, next) => {
   res.locals.donateConfig = { ...donateConfig(req.lang), nonce: res.locals.cspNonce };
-  res.locals.formatMoney = (cents) => formatMoney(cents, config.currency, req.lang === 'he' ? 'he-IL' : 'en-US');
+  res.locals.formatMoney = (cents, currency = config.currency) => formatMoney(cents, currency, req.lang === 'he' ? 'he-IL' : 'en-US');
+  res.locals.currencySymbol = SYMBOL;
   res.locals.path = req.path;
   res.locals.baseUrl = config.baseUrl;
   next();

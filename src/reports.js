@@ -45,28 +45,29 @@ function weekStart(dateStr) {
   return addDays(dateStr, -dow);
 }
 
-function countedSince(fromDateStr) {
+function countedSince(fromDateStr, currency) {
   const fromIso = new Date(localDayStartUtc(fromDateStr)).toISOString();
   return db.get()
-    .prepare(`SELECT amount_cents - refunded_cents AS net, completed_at, type FROM donations WHERE ${COUNTED} AND completed_at >= ?`)
-    .all(fromIso);
+    .prepare(`SELECT amount_cents - refunded_cents AS net, completed_at, type FROM donations WHERE ${COUNTED} AND completed_at >= ? AND currency = ?`)
+    .all(fromIso, currency);
 }
 
-function summary() {
+/** Dashboard numbers for one currency (₪ and $ are never added together). */
+function summary(currency = config.currency) {
   const d = db.get();
   const today = localDate(Date.now());
   const wk = weekStart(today);
   const mo = today.slice(0, 8) + '01';
 
-  const all = d.prepare(`SELECT COUNT(*) n, COALESCE(SUM(amount_cents - refunded_cents),0) t FROM donations WHERE ${COUNTED}`).get();
+  const all = d.prepare(`SELECT COUNT(*) n, COALESCE(SUM(amount_cents - refunded_cents),0) t FROM donations WHERE ${COUNTED} AND currency = ?`).get(currency);
   const sumSince = (from) => {
-    const rows = countedSince(from);
+    const rows = countedSince(from, currency);
     return { n: rows.length, t: rows.reduce((a, r) => a + r.net, 0) };
   };
 
   // series: last 30 days, 12 weeks, 12 months
   const start = addDays(today, -400);
-  const rows = countedSince(start).map((r) => ({ ...r, day: localDate(Date.parse(r.completed_at)) }));
+  const rows = countedSince(start, currency).map((r) => ({ ...r, day: localDate(Date.parse(r.completed_at)) }));
 
   const daily = [];
   for (let i = 29; i >= 0; i--) daily.push({ key: addDays(today, -i), n: 0, t: 0 });
@@ -89,7 +90,8 @@ function summary() {
   }
 
   const counts = Object.fromEntries(d.prepare('SELECT status, COUNT(*) n FROM donations GROUP BY status').all().map((r) => [r.status, r.n]));
-  const subs = d.prepare(`SELECT COUNT(*) n, COALESCE(SUM(amount_cents),0) t FROM subscriptions WHERE status='active'`).get();
+  const subs = d.prepare(`SELECT COUNT(*) n, COALESCE(SUM(amount_cents),0) t FROM subscriptions WHERE status='active' AND currency = ?`).get(currency);
+  const otherCurrencies = d.prepare(`SELECT currency, COUNT(*) n, COALESCE(SUM(amount_cents - refunded_cents),0) t FROM donations WHERE ${COUNTED} AND currency != ? GROUP BY currency`).all(currency);
   const unread = d.prepare('SELECT COUNT(*) n FROM contact_messages WHERE is_read = 0').get().n;
 
   return {
@@ -101,6 +103,8 @@ function summary() {
     daily, weekly, monthly,
     counts,
     activeSubs: subs,
+    otherCurrencies,
+    currency,
     unread,
   };
 }
@@ -124,16 +128,18 @@ function buildFilter(q = {}) {
   if (dateRe.test(q.from || '')) { where.push('created_at >= @from'); params.from = new Date(localDayStartUtc(q.from)).toISOString(); }
   if (dateRe.test(q.to || '')) { where.push('created_at < @to'); params.to = new Date(localDayStartUtc(addDays(q.to, 1))).toISOString(); }
   if (/^\d+$/.test(q.min || '')) { where.push('amount_cents >= @min'); params.min = Number(q.min) * 100; }
+  if (/^[A-Z]{3}$/.test(q.currency || '')) { where.push('currency = @currency'); params.currency = q.currency; }
   return { sql: where.length ? `WHERE ${where.join(' AND ')}` : '', params };
 }
 
 function searchDonations(q = {}, { page = 1, pageSize = 50, all = false } = {}) {
   const { sql, params } = buildFilter(q);
   const d = db.get();
-  const agg = d.prepare(`SELECT COUNT(*) n, COALESCE(SUM(CASE WHEN ${COUNTED} THEN amount_cents - refunded_cents ELSE 0 END),0) t FROM donations ${sql}`).get(params);
+  const agg = { n: d.prepare(`SELECT COUNT(*) n FROM donations ${sql}`).get(params).n };
+  const sums = d.prepare(`SELECT currency, COALESCE(SUM(CASE WHEN ${COUNTED} THEN amount_cents - refunded_cents ELSE 0 END),0) t FROM donations ${sql} GROUP BY currency`).all(params);
   const limit = all ? '' : `LIMIT ${pageSize} OFFSET ${(Math.max(1, page) - 1) * pageSize}`;
   const rows = d.prepare(`SELECT * FROM donations ${sql} ORDER BY created_at DESC, id DESC ${limit}`).all(params);
-  return { rows, count: agg.n, sum: agg.t, pages: Math.max(1, Math.ceil(agg.n / pageSize)) };
+  return { rows, count: agg.n, sums: sums.filter((s) => s.t > 0), sum: sums.reduce((a, s) => a + s.t, 0), pages: Math.max(1, Math.ceil(agg.n / pageSize)) };
 }
 
 module.exports = { summary, searchDonations, STATUSES, localDate, localDayStartUtc, addDays, weekStart };

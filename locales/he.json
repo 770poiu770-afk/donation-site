@@ -1,5 +1,13 @@
 {
-  "nav": { "home": "בית", "mission": "המטרה", "impact": "השפעה", "faq": "שאלות", "contact": "צור קשר", "donate": "Donate Now", "language": "English" },
+  "nav": {
+    "home": "בית",
+    "mission": "המטרה",
+    "impact": "השפעה",
+    "faq": "שאלות",
+    "contact": "צור קשר",
+    "donate": "Donate Now",
+    "language": "English"
+  },
   "donate": {
     "title": "תרומה",
     "oneTime": "חד-פעמית",
@@ -19,18 +27,20 @@
     "message": "הודעה אישית",
     "processing": "התרומה בעיבוד…",
     "loadingPayPal": "טוען תשלום מאובטח…",
-    "errAmount": "בחרו או הקלידו סכום בין $1 ל-$1,000,000.",
+    "errAmount": "בחרו או הקלידו סכום בין 1 ל-1,000,000.",
     "errGeneric": "משהו השתבש. לא בוצע חיוב. נסו שוב.",
     "errDeclined": "אמצעי התשלום נדחה. נסו כרטיס או אמצעי אחר.",
     "errUnavailable": "התרומות באתר אינן זמינות כרגע. נסו שוב בקרוב.",
     "cancelled": "התשלום בוטל. לא בוצע חיוב.",
-    "chooseMethod": "בחרו אמצעי תשלום"
+    "chooseMethod": "בחרו אמצעי תשלום",
+    "currency": "מטבע"
   },
   "errors": {
     "amount_required": "בחרו סכום.",
     "amount_invalid": "הקלידו סכום תקין.",
-    "amount_too_small": "סכום התרומה המינימלי הוא $1.",
-    "amount_too_large": "סכום התרומה המקסימלי הוא $1,000,000."
+    "amount_too_small": "סכום התרומה המינימלי הוא 1.",
+    "amount_too_large": "סכום התרומה המקסימלי הוא 1,000,000.",
+    "currency_invalid": "בחרו מטבע."
   },
   "home": {
     "raised": "נתרמו עד כה",
@@ -73,7 +83,9 @@
     "address": "כתובת",
     "whatsapp": "וואטסאפ"
   },
-  "faq": { "title": "שאלות ותשובות" },
+  "faq": {
+    "title": "שאלות ותשובות"
+  },
   "footer": {
     "privacy": "מדיניות פרטיות",
     "terms": "תנאי שימוש",
@@ -81,5 +93,9 @@
     "rights": "כל הזכויות שמורות.",
     "secure": "התרומות מעובדות בצורה מאובטחת על ידי PayPal."
   },
-  "notFound": { "title": "הדף לא נמצא", "text": "הדף שחיפשת לא קיים.", "back": "חזרה לדף הבית" }
+  "notFound": {
+    "title": "הדף לא נמצא",
+    "text": "הדף שחיפשת לא קיים.",
+    "back": "חזרה לדף הבית"
+  }
 }

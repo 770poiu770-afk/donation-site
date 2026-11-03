@@ -5,7 +5,7 @@
     <% if (item) {
       const isSub = kind === 'subscription';
       const pending = isSub ? item.status !== 'active' : item.status === 'pending';
-      const amount = formatMoney(item.amount_cents);
+      const amount = formatMoney(item.amount_cents, item.currency);
       const when = item.completed_at || item.activated_at || item.created_at;
       const dateStr = new Intl.DateTimeFormat(lang === 'he' ? 'he-IL' : 'en-US', { dateStyle: 'long', timeStyle: 'short', timeZone: 'Asia/Jerusalem' }).format(new Date(when));
     %>

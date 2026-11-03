@@ -108,3 +108,6 @@ code, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monosp
   .who { margin-inline-start: 0; }
   .wrap { padding: 18px 14px 50px; }
 }
+
+.dash-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.dash-head .chips { margin: 0; }
